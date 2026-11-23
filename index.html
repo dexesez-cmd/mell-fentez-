@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Видеоредактор</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0d0d0d"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+/* ===== Стили: тёмная тема, бирюзовый акцент ===== */
+:root{color-scheme:dark;--bg:#0d0d0d;--p:#1a1a1a;--ac:#4fd1e5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:#eee;font:14px system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
+#app{display:flex;flex-direction:column;height:100%;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button{min-height:44px;min-width:44px;border:0;border-radius:12px;background:var(--p);color:#eee;font:inherit}
+button:active{filter:brightness(1.5)}
+#top{height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px}
+#exp{background:var(--ac);color:#000;font-weight:700;padding:0 18px}
+#pv{flex:0 0 40%;min-height:0;display:flex;align-items:center;justify-content:center;background:#050505}
+#ctl{height:52px;flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}
+#ctl>div:last-child{text-align:right}
+#play{background:var(--ac);color:#000;font-size:20px;width:56px;border-radius:50%}
+#tl{flex:1;min-height:0;position:relative;border-top:1px solid #222}
+#lbl{position:absolute;left:0;top:22px;width:44px}
+#lbl div{height:40px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--p);border-bottom:1px solid var(--bg)}
+#area{position:absolute;left:44px;right:0;top:0;bottom:0;overflow:hidden;touch-action:none;background:repeating-linear-gradient(#141414 0 40px,#1b1b1b 40px 80px) 0 22px}
+#rl{position:absolute;left:0;top:0;height:22px}
+#lane{position:absolute;left:0;top:22px;width:1px}
+#ph{position:absolute;left:calc(44px + (100% - 44px)/2 - 1px);top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:3}
+#ph.sn{background:var(--ac);box-shadow:0 0 8px var(--ac)}
+.clip{position:absolute;height:34px;border-radius:8px;background:#2c3e50 left center/auto 100% repeat-x;font-size:11px;white-space:nowrap;overflow:hidden}
+.clip span{position:absolute;left:0;top:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;background:#0009;padding:1px 5px}
+.t1{background-color:#3b4a6b}.t2{background-color:#1f5a3a}.t3{background-color:#7b3fa0}.t4{background-color:#8a5a1f}
+.clip.sel{overflow:visible;outline:2px solid #fff}
+.h{position:absolute;top:0;bottom:0;width:14px;background:#fff;border-radius:6px}
+.h.l{left:-3px}.h.r{right:-3px}
+.add{position:absolute;width:34px;height:34px;border-radius:8px;background:var(--ac);color:#000;font-size:22px;text-align:center;line-height:34px}
+#tb{flex:none;height:72px;display:flex;gap:4px;overflow-x:auto;padding:4px;background:var(--bg);position:relative;z-index:6;scrollbar-width:none}
+#tb::-webkit-scrollbar{display:none}
+#tb button{flex:none;width:66px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;background:none}
+#tb button b{font-size:22px;font-weight:400}
+/* Шторка снизу: максимум 40% высоты, выезжает из-за нижней строки */
+#sh{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));max-height:40vh;overflow:auto;background:#242424;border-radius:16px 16px 0 0;padding:0 12px 8px;transform:translateY(130%);transition:transform .2s;z-index:5;pointer-events:none}
+#sh.open{transform:none;pointer-events:auto}
+#grip{height:22px;display:flex;justify-content:center}
+#grip::before{content:'';width:36px;height:4px;margin-top:9px;border-radius:2px;background:#666}
+#shh{font-weight:600;margin-bottom:6px}
+#shf{display:flex;justify-content:space-between;margin-top:8px}
+.rt{margin:4px;padding:0 20px}.rt.on{background:var(--ac);color:#000}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:90%;background:#333;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .2s;z-index:10;pointer-events:none;text-align:center}
+/* ===== Оформление как в CapCut ===== */
+i{display:flex;font-style:normal}
+svg{display:block;flex:none}
+.ib{background:none;border-radius:0;display:flex;align-items:center;justify-content:center;padding:0}
+#top{height:52px;padding:0 6px}
+#top>div{display:flex;align-items:center;gap:8px}
+#rs,#exp{min-height:36px;height:36px;min-width:0;border-radius:10px;font-size:14px;display:flex;align-items:center}
+#rs{background:#2a2a2a;padding:0 8px 0 12px;gap:2px;font-weight:600}
+#exp{padding:0 16px}
+#pv{background:#0d0d0d}
+#ctl{height:48px}
+#ctl>div{display:flex;align-items:center}
+#ctl>div:last-child{justify-content:flex-end}
+#play{background:none;border-radius:0;width:56px}
+#tm{margin-left:4px;font-size:12px;color:#8a8a8a}
+#tm b{color:#fff;font-weight:400}
+#sn{flex-direction:column;gap:1px}
+#sn span{font-size:10px;line-height:1}
+#sn.off{opacity:.4}
+#tl{border-top:0}
+#lbl{width:68px;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:4px}
+#mu{flex-direction:column;width:64px;gap:2px;white-space:nowrap}
+#mu span{font-size:12px}
+#lbl #cov{position:relative;width:52px;height:52px;border:0;border-radius:6px;background:#222 center/cover;flex-direction:column;justify-content:flex-end;align-items:center}
+#cov i{position:absolute;top:3px;right:3px}
+#cov span{width:100%;text-align:center;font-size:12px;background:#0007;border-radius:0 0 6px 6px}
+#area{left:68px;background:#0d0d0d}
+#ph{left:calc(68px + (100% - 68px)*.45 - 1px)}
+.clip{border-radius:6px;font-size:12px}
+.clip span{background:none;padding:0 6px;line-height:28px}
+.t2{background-color:#1d3f4d}.t3{background-color:#5a4524}
+.h{width:12px;background:#fff;border-radius:5px}
+.add{width:40px;height:40px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;line-height:1}
+.hint{position:absolute;left:0;height:28px;padding:0 10px;display:flex;align-items:center;gap:6px;border-radius:6px;background:#1a1a1a;color:#8a8a8a;font-size:12px;white-space:nowrap}
+#tb button{width:72px;gap:4px;font-size:12px;color:#fff}
+#tb button b{display:flex}
+/* ===== Библиотека футажей ===== */
+#lib{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));height:70vh;background:#1a1a1a;border-radius:16px 16px 0 0;transform:translateY(130%);transition:transform .2s;z-index:5;display:flex;flex-direction:column;padding:10px 10px 0;pointer-events:none}
+#lib.open{transform:none;pointer-events:auto}
+#lh{display:flex;gap:6px;align-items:center}
+#lq,#mc input{height:40px;border:0;border-radius:12px;background:#2a2a2a;color:#fff;padding:0 12px;font:inherit;user-select:text;-webkit-user-select:text}
+#lq{flex:1;min-width:0}
+#lch{display:flex;gap:6px;overflow-x:auto;padding:8px 0;scrollbar-width:none;flex:none}
+.ch{flex:none;min-height:32px;padding:0 12px;border-radius:16px;background:#2a2a2a;font-size:12px}
+.ch.on,.pri{background:var(--ac);color:#000;font-weight:600}
+#lg{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;align-content:start}
+#lg .emp{grid-column:1/4;display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 0;color:#8a8a8a}
+.tile{position:relative;aspect-ratio:1;border-radius:6px;background:#2a2a2a center/cover;overflow:hidden;font-size:12px;display:flex;align-items:center;justify-content:center}
+.tile span{position:absolute;padding:2px 5px;background:#000a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tile .n{left:0;right:0;bottom:0}.tile .d{top:0;left:0;border-radius:0 0 6px 0}
+#ls{flex:none;font-size:12px;color:#8a8a8a;padding:6px 0}
+#md{position:fixed;inset:0;background:#000c;display:none;z-index:20;align-items:center;justify-content:center;padding:12px}
+#mc{width:100%;max-width:420px;max-height:90vh;overflow:auto;background:#1a1a1a;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+#mc video,#mc img{width:100%;max-height:30vh;object-fit:contain;background:#000;border-radius:8px}
+#mc audio{width:100%}
+.row{display:flex;gap:8px;align-items:center}.row button{flex:1}
+.wr{color:#f0b429;font-size:12px}
+input[type=range]{accent-color:#4fd1e5}
+#mc select{height:40px;border:0;border-radius:10px;background:#2a2a2a;color:#fff;padding:0 10px;font:inherit}
+#mc input[type=file]{height:auto;padding:8px}
+#cv{touch-action:none}
+.sl{display:grid;grid-template-columns:84px 1fr 40px auto;gap:6px;align-items:center;margin:4px 0;font-size:12px}
+.sl b{font-weight:400;text-align:right}
+/* ===== Отдельный режим 3D ===== */
+#e3{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:#1a1a1a;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.m3 #e3{display:flex}
+#e3v{flex:1;min-height:0;position:relative;touch-action:none;overflow:hidden;background:#2b2b2b}
+#e3v canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#e3t{position:absolute;top:6px;left:6px;right:6px;display:flex;gap:4px;align-items:center;z-index:2}
+#e3l{background:#1a1a1ad0;border-radius:12px}
+#e3p{flex:none;height:52px;display:flex;align-items:center;gap:8px;padding:0 8px;background:#1a1a1a}
+#e3p input{flex:1}
+#e3m{font-size:12px;color:#8a8a8a;white-space:nowrap}
+#e3b{flex:none;height:72px;display:flex;gap:4px;overflow-x:auto;padding:4px;background:#0d0d0d;scrollbar-width:none}
+#e3b button{flex:none;width:72px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:#fff;background:none}
+#e3b button b{display:flex;font-weight:400}
+.m3 #sh{z-index:31}.m3 #md{z-index:40}.m3 #toast{z-index:50}
+</style></head><body>
+<div id="app">
+ <div id="top"><div><button class='ib' id='cls'><i data-i='close'></i></button><button class='ib' id='sr'><i data-i='search'></i></button></div><div><button id='rs'></button><button id='exp'>Экспорт</button></div></div>
+ <div id="pv"><canvas id="cv"></canvas></div>
+ <div id='ctl'><div><button class='ib' id='fs'><i data-i='full'></i></button><span id='tm'><b>00:00</b> / 00:00</span></div><button id='play'><i data-i='play' data-s='28'></i></button><div><button class='ib' id='sn'><i data-i='magnet'></i><span>ON</span></button><button class='ib' id='un'><i data-i='undo'></i></button><button class='ib' id='re'><i data-i='redo'></i></button></div></div>
+ <div id="tl"><div id='lbl'><button class='ib' id='mu'><i data-i='vol'></i><span>Выкл. звук</span></button><div id='cov'><i data-i='pen' data-s='16'></i><span>Обложка</span></div></div><div id="area"><canvas id="rl"></canvas><div id="lane"></div></div><div id="ph"></div></div>
+ <div id="tb"></div>
+</div>
+<div id="sh"><div id="grip"></div><div id="shh"></div><div id="shb"></div><div id='shf'><button class='ib' id='no'><i data-i='close'></i></button><button class='ib' id='ok'><i data-i='check'></i></button></div></div>
+<div id='lib'><div id='lh'><input id='lq' placeholder='Поиск: название, фраза, теги'><button class='ib' id='la'><i data-i='plus'></i></button><button class='ib' id='lx'><i data-i='close'></i></button></div><div id='lch'></div><div id='lg'></div><div id='ls'></div></div>
+<div id='md'><div id='mc'></div></div>
+<div id='e3'><div id='e3v'><div id='e3t'><button class='ib' id='e3h'><i data-i='home'></i></button><button class='ib' id='e3u'><i data-i='undo'></i></button><button class='ib' id='e3r'><i data-i='redo'></i></button><span style='flex:1'></span><button class='ib' id='e3z'><i data-i='refresh'></i></button><button class='ib' id='e3l'><i data-i='list'></i></button></div></div><div id='e3p'><button class='ib' id='e3pl'><i data-i='play' data-s='28'></i></button><span id='e3m'>00:00 / 00:00</span><input type='range' id='e3s' min='0' max='1' step='.001'></div><div id='e3b'></div></div>
+<input type='file' id='lf' multiple accept='video/*,image/*' hidden>
+<div id="toast"></div>
+<input type="file" id="file" multiple accept="video/*,image/*" hidden>
+<script>
+// ===== 1. Данные проекта (всё хранится в памяти) =====
+const $=id=>document.getElementById(id);
+const cv=$('cv'),cx=cv.getContext('2d'),A=$('area');
+// media — загруженные файлы; els — по одному video/audio на клип; clips — клипы на дорожках
+let media={},els={},clips=[],sel=null,t=0,pps=60,playing=false,ratio=[9,16],res=720,nid=1,addTrack=0,g=null;
+// Дорожки: 0 основная, 1 наложение, 2 аудио, 3 текст, 4 эффекты
+let Y={},muted=false,snapOn=true; // Y — высота строк таймлайна
+// Иконки: только линейные SVG, белые, stroke 1.8, 24x24
+const IC={
+close:`<path d='M6 6l12 12M18 6L6 18'/>`,search:`<circle cx='11' cy='11' r='6.5'/><path d='M16 16l4.5 4.5'/>`,chev:`<path d='M6 9l6 6 6-6'/>`,
+full:`<path d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/>`,play:`<path d='M8 5l11 7-11 7z'/>`,
+pause:`<rect x='6' y='5' width='4' height='14' rx='1'/><rect x='14' y='5' width='4' height='14' rx='1'/>`,
+magnet:`<path d='M6 3v9a6 6 0 0 0 12 0V3h-4v9a2 2 0 0 1-4 0V3z'/><path d='M6 7h4M14 7h4'/>`,
+undo:`<path d='M9 14L4 9l5-5'/><path d='M4 9h10a6 6 0 0 1 0 12h-3'/>`,redo:`<path d='M15 14l5-5-5-5'/><path d='M20 9H10a6 6 0 0 0 0 12h3'/>`,
+vol:`<path d='M4 9v6h4l5 4V5L8 9z'/><path d='M16.5 9a4 4 0 0 1 0 6'/>`,pen:`<path d='M4 20l1-4L16 5l3 3L8 19z'/><path d='M14 7l3 3'/>`,
+plus:`<path d='M12 5v14M5 12h14'/>`,check:`<path d='M5 12l5 5 9-10'/>`,back:`<path d='M15 5l-7 7 7 7'/>`,
+cut:`<circle cx='6' cy='6' r='2.5'/><circle cx='6' cy='18' r='2.5'/><path d='M8 7.5L20 18M8 16.5L20 6'/>`,
+note:`<path d='M9 18V5l11-2v13'/><circle cx='6.5' cy='18' r='2.5'/><circle cx='17.5' cy='16' r='2.5'/>`,
+text:`<path d='M5 6V4h14v2M12 4v16M9 20h6'/>`,layers:`<path d='M12 3l9 5-9 5-9-5z'/><path d='M3 13l9 5 9-5'/>`,
+spark:`<path d='M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z'/>`,filter:`<circle cx='9' cy='12' r='5.5'/><circle cx='15' cy='12' r='5.5'/>`,
+sub:`<rect x='3' y='5' width='18' height='14' rx='3'/><path d='M7 11h6M7 15h10'/>`,
+cube:`<path d='M12 3l8 4.5v9L12 21l-8-4.5v-9z'/><path d='M12 12l8-4.5M12 12v9M12 12L4 7.5'/>`,
+cam:`<rect x='3' y='7' width='13' height='10' rx='2'/><path d='M16 11l5-3v8l-5-3'/>`,keys:`<rect x='3' y='5' width='18' height='14' rx='2'/><path d='M9 5v14M15 5v14'/>`,
+frame:`<path d='M7 3v14h14M3 7h14v14'/>`,speed:`<path d='M4 17a8 8 0 1 1 16 0'/><path d='M12 17l4-5'/>`,
+wave:`<path d='M3 17c4 0 4-10 9-10s5 10 9 10'/>`,drop:`<path d='M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'/>`,
+mask:`<circle cx='12' cy='12' r='8'/><path d='M12 4a8 8 0 0 1 0 16z'/>`,
+blend:`<rect x='3' y='3' width='12' height='12' rx='2'/><rect x='9' y='9' width='12' height='12' rx='2'/>`,
+dup:`<rect x='8' y='8' width='12' height='12' rx='2'/><path d='M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2'/>`,
+trash:`<path d='M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3'/>`,
+snow:`<path d='M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9'/>`,
+home:`<path d='M4 11l8-7 8 7M6 10v10h12V10'/>`,list:`<path d='M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01'/>`,
+refresh:`<path d='M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4'/>`,sky:`<path d='M6 18a4 4 0 0 1 1-8 6 6 0 0 1 11 2 3 3 0 0 1 0 6z'/>`,
+img:`<rect x='3' y='5' width='18' height='14' rx='2'/><circle cx='9' cy='10' r='1.5'/><path d='M21 16l-5-5-9 8'/>`,bulb:`<path d='M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z'/>`,
+star:`<path d='M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'/>`,folder:`<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>`};
+const ic=(n,s=24,c='#fff')=>`<svg width='${s}' height='${s}' viewBox='0 0 24 24' fill='none' stroke='${c}' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'>${IC[n]}</svg>`;
+const fmt=s=>{s=Math.max(0,s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')};
+const total=()=>clips.reduce((m,c)=>Math.max(m,c.start+c.dur),0);
+
+// ===== 2. Сообщения об ошибках внизу экрана =====
+let tt;function toast(m){const e=$('toast');e.textContent=m;e.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>e.style.opacity=0,3000);}
+window.onerror=m=>toast('Ошибка: '+m);
+window.onunhandledrejection=e=>toast('Ошибка: '+((e.reason&&e.reason.message)||e.reason));
+
+// ===== 3. Отмена и повтор (стек состояний, без лимита) =====
+const hist=[];let hi=-1;
+const ST=()=>JSON.stringify({clips,ratio});
+function save(){const s=ST();if(s===hist[hi])return;hist.length=hi+1;hist.push(s);hi++;pSave();}
+function restore(){const o=JSON.parse(hist[hi]);clips=o.clips;ratio=o.ratio;sel=null;fitCanvas();build();}
+function undo(){if(hi>0){hi--;restore();}else toast('Нечего отменять');}
+function redo(){if(hi<hist.length-1){hi++;restore();}}
+
+// ===== 4. Загрузка файлов =====
+const once=(el,ev)=>new Promise((ok,no)=>{el.addEventListener(ev,ok,{once:true});el.addEventListener('error',()=>no(new Error('err')),{once:true});});
+async function thumb(v){ // миниатюра из кадра видео
+  v.currentTime=Math.min(.1,v.duration/2);
+  await Promise.race([once(v,'seeked'),new Promise(r=>setTimeout(r,2000))]);
+  const c=document.createElement('canvas');c.width=80;c.height=Math.round(80*v.videoHeight/v.videoWidth)||45;
+  try{c.getContext('2d').drawImage(v,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.7);}catch(e){return '';}
+}
+async function addFiles(fs){
+  for(const f of fs){try{
+    const type=f.type.split('/')[0];
+    if(!['video','image','audio'].includes(type)){toast('Формат не поддерживается: '+f.name);continue;}
+    const m={id:'m'+nid++,type,name:f.name,url:URL.createObjectURL(f),dur:3,blob:f};
+    if(type==='image'){m.img=new Image();m.img.src=m.url;await once(m.img,'load');m.w=m.img.naturalWidth;m.h=m.img.naturalHeight;}
+    else{const v=document.createElement(type==='video'?'video':'audio');v.preload='auto';v.muted=true;v.src=m.url;
+      await once(v,'loadedmetadata');m.dur=isFinite(v.duration)?v.duration:10;
+      if(type==='video'){m.thumb=await thumb(v);m.w=v.videoWidth;m.h=v.videoHeight;}}
+    media[m.id]=m;
+    if(m.w&&!clips.some(c=>c.tr<2)){ratio=[m.w,m.h];fitCanvas();} // кадр по пропорциям первого видео
+    const tr=type==='audio'?2:(addTrack===2?0:addTrack);
+    const end=clips.filter(c=>c.tr===tr).reduce((x,c)=>Math.max(x,c.start+c.dur),0);
+    clips.push({id:'c'+nid++,m:m.id,tr,start:tr===1?t:end,in:0,dur:m.dur});
+  }catch(err){toast('Не удалось открыть файл: '+f.name);}}
+  addTrack=0;save();build();
+}
+$('file').onchange=e=>{addFiles([...e.target.files]);e.target.value='';};
+document.ondragover=e=>e.preventDefault();
+document.ondrop=e=>{e.preventDefault();addTrack=0;addFiles([...e.dataTransfer.files]);};
+
+// ===== 5. Предпросмотр: кадр, воспроизведение, отрисовка слоёв =====
+const RT=[[9,16],[16,9],[1,1],[4,5],[4,3]];
+function fitCanvas(){
+  const [a,b]=ratio,mn=Math.min(a,b),w=Math.round(res*a/mn),h=Math.round(res*b/mn);
+  cv.width=w;cv.height=h;
+  const p=$('pv'),k=Math.min(p.clientWidth/w,p.clientHeight/h);
+  cv.style.width=w*k+'px';cv.style.height=h*k+'px';
+}
+function el(c){ // свой video/audio на каждый клип
+  const m=media[c.m];if(m.type==='image')return m.img;
+  if(!els[c.id]){const e=document.createElement(m.type==='video'?'video':'audio');e.src=m.url;e.preload='auto';e.playsInline=true;els[c.id]=e;}
+  return els[c.id];
+}
+let stall=false;
+function sync(){ // подгоняем видео и звук под курсор
+  stall=false;
+  const A3={};clips.forEach(k=>{if(k.fxn==='3d'&&t>=k.start&&t<k.start+k.dur)k.sc3.objs.forEach(o=>{if(o.src)A3[o.src]=k;});}); // видео, живущие слоями в 3D-сцене
+  for(const c of clips){const m=media[c.m];if(!m||m.type==='image')continue;
+    const k3=A3[c.id],on=!!k3||(t>=c.start&&t<c.start+c.dur),e=on?el(c):els[c.id];
+    if(e)e.muted=muted;
+    if(!on){if(e&&!e.paused)e.pause();continue;}
+    if(c.fz){e.muted=true;if(!e.paused)e.pause();if(Math.abs(e.currentTime-c.in)>.04)e.currentTime=c.in;continue;} // заморозка кадра
+    const sp=c.sp||1,want=k3?c.in+(((t-k3.start)*sp)%Math.max(.1,c.dur*sp)):c.in+(t-c.start)*sp;e.playbackRate=sp;let vl=c.vol??1;if(c.fi)vl*=Math.min(1,(t-c.start)/c.fi);if(c.fo)vl*=Math.min(1,(c.start+c.dur-t)/c.fo);e.volume=Math.max(0,Math.min(1,vl)); // громкость с затуханием
+    if(playing){if(e.seeking){stall=true;continue;}if(e.paused)e.play().catch(()=>{});if(Math.abs(e.currentTime-want)>.5)e.currentTime=want;}
+    else{if(!e.paused)e.pause();if(Math.abs(e.currentTime-want)>.04)e.currentTime=want;}
+  }
+}
+function draw(){
+  const W=cv.width,H=cv.height;cx.fillStyle='#000';cx.fillRect(0,0,W,H);
+  // Эффекты с дорожки «эффекты» действуют на весь кадр: тряска, зум-удар, вспышка, фильтры
+  let sx=0,sy=0,zs=1,rot=0,flash=0,red=0,vig=0,gl=0,flt='',chat=[];
+  const L3=new Set();clips.forEach(k=>{if(k.fxn==='3d'&&t>=k.start&&t<k.start+k.dur)k.sc3.objs.forEach(o=>o.src&&L3.add(o.src));}); // клипы, ушедшие в 3D-плоскости, в 2D не рисуем
+  for(const c of clips)if(c.tr===4&&t>=c.start&&t<c.start+c.dur){const p=(t-c.start)/c.dur,n=c.fxn,f=n==='accent'?1-p:1;
+    if(n==='shake'||n==='accent'){sx+=Math.sin(t*90)*W*.02*f;sy+=Math.cos(t*70)*H*.012*f;}
+    if(n==='zoom'||n==='accent')zs*=1+.25*(1-p);
+    if(n==='flash'||n==='accent')flash=Math.max(flash,(1-p)*(n==='accent'?.6:1));
+    if(n==='bw')flt='grayscale(1)';if(n==='inv')flt='invert(1)';if(n==='blur')flt='blur('+W*.01+'px)';
+    if(n==='sway'){sx+=Math.sin(t*6)*W*.03;rot+=Math.sin(t*6)*.05;} // покачивание
+    if(n==='pulse')zs*=1+.06*Math.pow(Math.max(0,Math.sin(t*12.57)),3); // пульс 120 уд/мин
+    if(n==='fry')flt='saturate(2.5) contrast(1.6) brightness(1.1)'; // пережарка
+    if(n==='glitch')gl=1;if(n==='red')red=Math.max(red,1-p);if(n==='vig')vig=1;if(n==='chat')chat.push([c,p]);}
+  cx.save();cx.translate(W/2+sx,H/2+sy);cx.rotate(rot);cx.scale(zs,zs);cx.translate(-W/2,-H/2);if(flt)cx.filter=flt;
+  for(const c of clips.filter(q=>q.tr<2).sort((a,b)=>kv(a,'z',a.z||0)-kv(b,'z',b.z||0)||a.tr-b.tr)){ // дальше от зрителя рисуем первым, потом по дорожкам
+    if(t<c.start||t>=c.start+c.dur||L3.has(c.id))continue;
+    const e=el(c),sw=e.videoWidth||e.naturalWidth,sh=e.videoHeight||e.naturalHeight;if(!sw)continue;
+    const Z=kv(c,'z',c.z||0),F=8/Math.max(.5,8-Z),k=Math.min(W/sw,H/sh)*kv(c,'sc',c.sc||1)*F;HB[c.id]={x:W/2+kv(c,'x',c.x||0)*W*F,y:H/2+kv(c,'y',c.y||0)*H*F,w:sw*k,h:sh*k,r:kv(c,'rot',c.rot||0)*Math.PI/180,z:Z,F}; // для рамки и попадания пальцем
+    let ph=0,at=''; // анимации входа и выхода (0.4 с)
+    if(c.ai&&t-c.start<.4){ph=1-(t-c.start)/.4;at=c.ai;}
+    if(c.ao&&c.start+c.dur-t<.4){ph=1-(c.start+c.dur-t)/.4;at=c.ao;}
+    const as=at==='zoom'?1+ph*.6:at==='pop'?Math.max(.01,1-ph):1; // параметры клипа: масштаб, сдвиг, поворот, отражение, прозрачность
+    cx.save();cx.globalAlpha=kv(c,'op',c.op??1)*Math.min(1,c.vi?(t-c.start)/c.vi:1,c.vo?(c.start+c.dur-t)/c.vo:1);cx.globalCompositeOperation=c.bm||'source-over';
+    const lf=(flt+(c.bri!=null?' brightness('+c.bri+')':'')+(c.con!=null?' contrast('+c.con+')':'')+(c.sat!=null?' saturate('+c.sat+')':'')).trim();if(lf)cx.filter=lf; // фильтры клипа
+    cx.translate(W/2+kv(c,'x',c.x||0)*W*F+(at==='slide'?-ph*W*.5:0),H/2+kv(c,'y',c.y||0)*H*F);cx.rotate(kv(c,'rot',c.rot||0)*Math.PI/180+(at==='spin'?ph*Math.PI*2:0));cx.scale(as,as);if(c.mir)cx.scale(-1,1);
+    if(c.mk)maskPath(c.mk,sw*k,sh*k);if(c.cut)cutPath(c.cut,sw*k,sh*k);
+    cx.drawImage(c.ck&&!pip?keyed(c,e,sw,sh):e,-sw*k/2,-sh*k/2,sw*k,sh*k);cx.restore();
+  }
+  for(const c of clips)if(c.fxn==='3d'&&t>=c.start&&t<c.start+c.dur){const r=r3(c,W,H);if(r)cx.drawImage(r,0,0,W,H);} // 3D-сцена поверх слоёв
+  for(const c of clips)if(c.fxn==='code'&&t>=c.start&&t<c.start+c.dur)runCode(c,W,H,(t-c.start)/c.dur);
+  for(const c of clips)if(c.tr===3&&t>=c.start&&t<c.start+c.dur){ // текст
+    const u=Math.min(1,(t-c.start)/.5),sz=H*(c.size||.06)*(c.an==='pulse'?1+.08*Math.sin(t*10):1);
+    cx.font='bold '+sz+'px '+(c.font?`'${c.font}',`:'')+'sans-serif';cx.textAlign='center';cx.fillStyle=c.col||'#fff';
+    cx.shadowColor='#000';cx.shadowBlur=8;cx.lineWidth=H*.006;cx.strokeStyle='#000';const tx=W/2+kv(c,'x',c.x||0)*W,ty=H/2+kv(c,'y',c.y||0)*H+(c.an==='rise'?(1-u)*H*.1:0),tt=c.an==='type'?c.text.slice(0,Math.ceil(c.text.length*Math.min(1,(t-c.start)/Math.min(1,c.dur/2)))):c.text; // анимации текста
+    HB[c.id]={x:tx,y:ty-sz*.3,w:cx.measureText(tt).width+sz*.4,h:sz*1.3,r:0};if(c.an==='rise')cx.globalAlpha=u;cx.strokeText(tt,tx,ty);cx.fillText(tt,tx,ty);cx.globalAlpha=1;cx.shadowBlur=0;
+  }
+  cx.restore();
+  if(flash>0){cx.fillStyle='rgba(255,255,255,'+flash+')';cx.fillRect(0,0,W,H);}
+  if(red>0){cx.fillStyle='rgba(255,0,0,'+red*.6+')';cx.fillRect(0,0,W,H);}
+  if(vig){const g=cx.createRadialGradient(W/2,H/2,H*.25,W/2,H/2,H*.8);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(170,0,0,.85)');cx.fillStyle=g;cx.fillRect(0,0,W,H);}
+  if(gl)for(let i=0;i<4;i++){const y=Math.random()*H,h=H*.04,o=(Math.random()-.5)*W*.12;cx.drawImage(cv,0,y,W,h,o,y,W,h);} // глитч: сдвинутые полосы
+  chat.forEach(([c,p],i)=>{ // чат: строка появляется и гаснет в конце
+    const u=p*c.dur,y=H*.94-(chat.length-1-i)*H*.045;cx.save();cx.globalAlpha=Math.max(0,Math.min(1,c.dur-u));
+    cx.font='bold '+H*.032+'px sans-serif';cx.textAlign='left';cx.lineWidth=H*.005;cx.strokeStyle='#000';cx.fillStyle='#fff';
+    cx.strokeText(c.line,W*.03,y);cx.fillText(c.line,W*.03,y);cx.restore();});
+  selFrame();
+}
+function toggle(){
+  if(playing)return pause();
+  if(!total())return toast('Добавь клип кнопкой «+» на таймлайне');
+  if(t>=total()-.05)t=0;playing=true;$('play').innerHTML=ic('pause',28);
+}
+function pause(){playing=false;$('play').innerHTML=ic('play',28);}
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(playing&&!stall){t+=dt;if(t>=total()){t=total();pause();}}
+  if(playing||m3||now<wake){sync();draw();ui();if(m3)rv3();} // в покое не перерисовываем зря
+  requestAnimationFrame(loop);
+}
+let wake=0;const kick=()=>{wake=performance.now()+500;};
+['pointerdown','pointermove','pointerup','input','click','keydown','wheel','seeked','loadeddata','canplay'].forEach(n=>document.addEventListener(n,kick,true));
+
+// ===== 6. Таймлайн: рисуем клипы, линейка, курсор по центру =====
+function ui(){ // двигается лента под курсором
+  const tmS='<b>'+fmt(t)+'</b> / '+fmt(total());if(ui.s!==tmS){ui.s=tmS;$('tm').innerHTML=tmS;}
+  const w=A.clientWidth,r=$('rl'),p=w*.45; // курсор левее центра, на 45% ширины
+  $('lane').style.transform='translateX('+(p-t*pps)+'px)';
+  if(r.width!==w){r.width=w;r.height=22;}
+  const q=r.getContext('2d');q.clearRect(0,0,w,22);q.fillStyle='#8a8a8a';q.font='11px system-ui,sans-serif';q.textAlign='center';
+  const h=pps>=40?1:pps>=15?2.5:5; // линейка: время, точка, время, точка…
+  for(let i=Math.max(0,Math.floor((t-p/pps)/h));(i*h-t)*pps+p<w+20;i++){const x=(i*h-t)*pps+p;
+    if(i%2===0)q.fillText(fmt(i*h),x,15);else{q.beginPath();q.arc(x,11,1.5,0,7);q.fill();}}
+}
+function build(){
+  kick();
+  const L=$('lane');L.innerHTML='';
+  // Строки таймлайна: наложения и эффекты видны, только если на них есть клипы
+  const has=n=>clips.some(c=>c.tr===n),rows=[has(1)&&1,0,2,3,has(4)&&4].filter(r=>r!==false);
+  const LN={},cnt={}; // ряды: клипы, которые пересекаются по времени, встают друг под другом
+  [1,2,3,4].forEach(tr=>{const ends=[];clips.filter(c=>c.tr===tr).sort((a,b)=>a.start-b.start).forEach(c=>{let i=ends.findIndex(e=>e<=c.start+.001);if(i<0){i=ends.length;ends.push(0);}ends[i]=c.start+c.dur;LN[c.id]=i;});cnt[tr]=Math.max(1,ends.length);});
+  Y={};let y=4;rows.forEach(r=>{Y[r]=y;y+=r===0?56:34*(cnt[r]||1)+2;});
+  for(const c of clips){
+    const m=media[c.m],d=document.createElement('div');
+    d.className='clip t'+c.tr+(c.id===sel?' sel':'');d.dataset.id=c.id;
+    d.style.cssText='left:'+c.start*pps+'px;width:'+c.dur*pps+'px;top:'+(Y[c.tr]+(c.tr?2+(LN[c.id]||0)*34:4))+'px;height:'+(c.tr?28:48)+'px';
+    if(m&&m.type==='video'&&m.thumb)d.style.backgroundImage='url('+m.thumb+')';
+    if(m&&m.type==='image')d.style.backgroundImage='url('+m.url+')';
+    if(c.kf)[...new Set(Object.values(c.kf).flat().map(q=>q[0]))].forEach(r=>{const m=document.createElement('i');m.className='kfm';m.style.left=(r*pps)+'px';d.append(m);}); // ромбики ключей
+    if(c.tr>1){const s=document.createElement('span');s.textContent=c.text||(m?m.name:'');d.append(s);}
+    if(c.id===sel)['l','r'].forEach(h=>{const e=document.createElement('div');e.className='h '+h;e.dataset.h=h;d.append(e);}); // ручки обрезки
+    L.append(d);
+  }
+  const a=document.createElement('div');a.className='add';a.innerHTML=ic('plus',22,'#000'); // «+» справа от клипов основной дорожки
+  a.style.left=(clips.filter(c=>c.tr===0).reduce((m,c)=>Math.max(m,c.start+c.dur),0)*pps+10)+'px';a.style.top=(Y[0]+8)+'px';L.append(a);
+  [[2,'audio','note','Добавить аудио'],[3,'text','text','Добавить текст']].forEach(([n,k,i,l])=>{ // подсказки на пустых дорожках
+    if(has(n))return;const e=document.createElement('div');e.className='hint';e.dataset.a=k;e.style.top=(Y[n]+2)+'px';
+    e.innerHTML=ic(i,16)+'<span>+ '+l+'</span>';L.append(e);});
+  const f=clips.filter(c=>c.tr===0).sort((a,b)=>a.start-b.start)[0],fm=f&&media[f.m]; // обложка — первый кадр
+  $('cov').style.backgroundImage=fm?'url('+(fm.thumb||fm.url)+')':'none';
+  cv.style.visibility=clips.length?'visible':'hidden'; // пустой проект — пустая тёмная область
+  buildToolbar();
+}
+function select(id){sel=id;build();}
+// Прилипание к курсору и краям других клипов
+function snapTo(s,c){
+  if(!snapOn)return s;
+  const th=8/pps,pts=[t];clips.forEach(o=>{if(o!==c)pts.push(o.start,o.start+o.dur);});
+  let best=null;
+  for(const p of pts)for(const off of [0,c.dur])if(Math.abs(s+off-p)<th)best=p-off;
+  if(best!==null){if(!g.sn&&navigator.vibrate)navigator.vibrate(8);g.sn=true;$('ph').classList.add('sn');return Math.max(0,best);}
+  g.sn=false;$('ph').classList.remove('sn');return s;
+}
+// Жесты: палец по пустому месту двигает ленту; долгое нажатие на клип — перенос; ручки — обрезка
+A.onpointerdown=e=>{
+  A.setPointerCapture(e.pointerId);
+  const cl=e.target.closest('.clip'),c=cl&&clips.find(k=>k.id===cl.dataset.id);
+  g={x:e.clientX,t0:t,tgt:e.target,moved:false,mode:'pan',c,h:e.target.dataset.h};
+  if(c&&g.h&&c.id===sel){g.mode='trim';g.c0={...c};}
+  else if(c)g.timer=setTimeout(()=>{if(!g.moved){g.mode='move';g.c0={...c};if(navigator.vibrate)navigator.vibrate(15);select(c.id);}},350);
+};
+A.onpointermove=e=>{
+  if(!g)return;const dx=e.clientX-g.x,ds=dx/pps;
+  if(Math.abs(dx)>6){g.moved=true;if(playing)pause();} // листаешь таймлайн, и предпросмотр останавливается
+  if(g.mode==='pan'){if(g.moved)t=Math.max(0,Math.min(total(),g.t0-ds));}
+  else if(g.mode==='move'){g.c.start=snapTo(Math.max(0,g.c0.start+ds),g.c);build();}
+  else{ // обрезка
+    const c=g.c,c0=g.c0,m=media[c.m],vid=m&&m.type!=='image';
+    if(g.h==='l'){const d=Math.max(Math.min(c0.dur-.2,ds),vid?-c0.in:-1e9,-c0.start);c.start=c0.start+d;c.in=c0.in+d;c.dur=c0.dur-d;}
+    else c.dur=Math.max(.2,Math.min(vid?m.dur-c0.in:1e9,c0.dur+ds));
+    build();
+  }
+};
+A.onpointerup=A.onpointercancel=()=>{
+  if(!g)return;clearTimeout(g.timer);const o=g;g=null;$('ph').classList.remove('sn');
+  if(o.mode!=='pan'){save();build();return;}
+  if(!o.moved){const hn=o.tgt.closest('.hint');if(o.tgt.closest('.add')){addTrack=0;$('file').accept='video/*,image/*';$('file').click();}else if(hn){hn.dataset.a==='audio'?pick(2)():addText();}else select(o.c?o.c.id:null);}
+};
+A.onwheel=e=>{if(e.ctrlKey){e.preventDefault();pps=Math.max(8,Math.min(300,pps*(e.deltaY<0?1.15:.87)));build();}};
+
+// ===== 7. Операции с клипами =====
+function split(){ // разрезать на курсоре
+  const c=clips.find(k=>k.id===sel)||clips.find(k=>k.tr===0&&t>k.start&&t<k.start+k.dur);
+  if(!c||t<=c.start+.1||t>=c.start+c.dur-.1)return toast('Поставь курсор внутрь клипа');
+  const n={...c,id:'c'+nid++,start:t,in:c.in+(t-c.start)*(c.sp||1),dur:c.start+c.dur-t};
+  c.dur=t-c.start;clips.push(n);sel=n.id;save();build();
+}
+function dup(){const c=clips.find(k=>k.id===sel);if(!c)return;const n={...c,id:'c'+nid++,start:c.start+c.dur};clips.push(n);sel=n.id;save();build();}
+function del(){if(!sel)return toast('Сначала выдели клип');clips=clips.filter(k=>k.id!==sel);sel=null;t=Math.min(t,total());save();build();}
+function addText(){const id='c'+nid++;clips.push({id,tr:3,start:t,in:0,dur:3,text:'Текст'});save();sel=id;build();editText();}
+
+// ===== 8. Нижняя панель инструментов (меняется, когда выделен клип) =====
+const pick=n=>()=>{addTrack=n;$('file').accept=n===2?'audio/*':'video/*,image/*';$('file').click();};
+const MAIN=[['cut','Изменить',()=>toast('Выдели клип на таймлайне — появятся его инструменты')],['note','Звук',pick(2)],['text','Текст',addText],['layers','Наложение',pick(1)],['spark','Эффекты',fxSheet],['filter','Фильтры',props],['sub','Субтитры',subAdd],['cube','3D',open3],['cam','Камера',()=>{tab3='c';open3();}],['keys','Сэмплер',sampler],['frame','Формат',fmtSheet],['folder','Библиотека',libOpen]];
+const CL=[['cut','Разделить',split],['text','Текст',editText],['speed','Скорость',props],['snow','Заморозка',freeze],['wave','Анимации',animSheet],['drop','Хромакей',chroma],['mask','Маска',maskSheet],['mask','Вырез',cutStart],['spark','Ключи',kfSheet],['blend','Копир. эфф.',fxCopy],['wave','Встав. эфф.',()=>fxPaste(false)],['wave','Эфф. всем',()=>fxPaste(true)],['text','Код',codeEdit],['blend','Режимы',blendSheet],['vol','Громкость',props],['dup','Дублировать',dup],['trash','Удалить',del]];
+function buildToolbar(){
+  const tb=$('tb');tb.innerHTML='';
+  const add=(i,l,f)=>{const b=document.createElement('button');b.innerHTML='<b>'+ic(i)+'</b>'+l;b.onclick=()=>typeof f==='number'?toast('«'+l+'» появится на этапе '+f):f();tb.append(b);};
+  if(sel)add('back','Назад',()=>select(null));
+  (sel?CL:MAIN).forEach(([i,l,f])=>add(i,l,f));
+}
+
+// ===== 9. Шторка настроек (пример — формат кадра) =====
+function sheet(title,html,onOk,onNo){
+  $('shh').textContent=title;$('shb').innerHTML=html;$('sh').classList.add('open');
+  $('ok').onclick=()=>{$('sh').classList.remove('open');onOk&&onOk();};
+  $('no').onclick=$('grip').onclick=()=>{$('sh').classList.remove('open');onNo&&onNo();};
+}
+function fmtSheet(){
+  const old=ratio;
+  sheet('Формат кадра',RT.map(r=>'<button class="rt" data-r="'+r+'">'+r[0]+':'+r[1]+'</button>').join(''),save,()=>{ratio=old;fitCanvas();});
+  const bs=[...$('shb').querySelectorAll('.rt')],mark=()=>bs.forEach(b=>b.classList.toggle('on',b.dataset.r===String(ratio)));
+  bs.forEach(b=>b.onclick=()=>{ratio=b.dataset.r.split(',').map(Number);fitCanvas();mark();});mark();
+}
+
+// ===== 10. Кнопки и горячие клавиши =====
+$('play').onclick=toggle;$('un').onclick=undo;$('re').onclick=redo;
+$('sn').onclick=()=>{snapOn=!snapOn;$('sn').classList.toggle('off',!snapOn);$('sn').lastChild.textContent=snapOn?'ON':'OFF';};
+$('mu').onclick=()=>{muted=!muted;$('mu').lastChild.textContent=muted?'Вкл. звук':'Выкл. звук';};
+$('sr').onclick=()=>{libOpen();setTimeout(()=>$('lq').focus(),250);}; // лупа открывает поиск по библиотеке
+$('cov').onclick=()=>toast('Выбор обложки появится позже');
+$('cls').onclick=projSheet;
+$('exp').onclick=exportVideo;
+const rsLabel=()=>{$('rs').innerHTML=res+'P'+ic('chev',16);};
+$('rs').onclick=()=>{res=res===720?1080:720;rsLabel();fitCanvas();};
+$('fs').onclick=()=>{try{(cv.requestFullscreen||cv.webkitRequestFullscreen).call(cv);}catch(e){toast('Полный экран не поддерживается');}};
+addEventListener('resize',fitCanvas);
+addEventListener('keydown',e=>{
+  if(/INPUT|TEXTAREA/.test(e.target.tagName))return;const k=e.key;
+  if(e.ctrlKey||e.metaKey){if(k.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo();}return;}
+  if(k===' '){e.preventDefault();toggle();}
+  else if(k==='s'||k==='S')split();
+  else if(k==='Delete'||k==='Backspace')del();
+  else if(k==='ArrowLeft')t=Math.max(0,t-1/30);
+  else if(k==='ArrowRight')t=Math.min(total(),t+1/30);
+});
+
+// ===== Библиотека футажей (этап 1Б): хранится в IndexedDB =====
+let db=null,items=[],fl='all',pend=[],mUrl=null,libM={}; // items — футажи; pend — очередь на подпись; libM — готовые media для вставки
+function dbOpen(){return new Promise(ok=>{try{const r=indexedDB.open('capcutlib',1);r.onupgradeneeded=()=>r.result.createObjectStore('items',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=()=>ok(null);}catch(e){ok(null);}});}
+async function libInit(){
+  db=await dbOpen();
+  if(!db){toast('Хранилище недоступно: библиотека работает, пока открыта страница');return;}
+  try{items=await new Promise((ok,no)=>{const q=db.transaction('items').objectStore('items').getAll();q.onsuccess=()=>ok(q.result);q.onerror=no;});}
+  catch(e){toast('Не удалось прочитать библиотеку');}
+}
+function dbPut(it){if(!db)return;try{const tx=db.transaction('items','readwrite');tx.objectStore('items').put(it);tx.onabort=()=>toast('Не удалось сохранить (возможно, нет места): '+it.name);}catch(e){toast('Не удалось сохранить в библиотеку');}}
+function dbDel(id){if(!db)return;try{db.transaction('items','readwrite').objectStore('items').delete(id);}catch(e){toast('Не удалось удалить');}}
+function space(){try{navigator.storage.estimate().then(e=>{$('ls').textContent='Занято: '+((e.usage/1048576)|0)+' МБ';if(e.quota&&e.usage/e.quota>.9)toast('Место в хранилище почти закончилось');});}catch(e){}}
+
+// --- Поиск: без регистра, е=ё, часть слова, опечатки (расстояние Левенштейна) ---
+const norm=s=>String(s||'').toLowerCase().replace(/ё/g,'е');
+function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const x=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=x;}}return d[b.length];}
+function hit(w,text){text=norm(text);if(text.includes(w))return true;if(w.length<4)return false;const lim=w.length<7?1:2;
+  return text.split(/[^a-zа-я0-9]+/).some(x=>x.length>=w.length-lim&&lev(w,x.slice(0,w.length))<=lim);}
+function results(){
+  const qs=norm($('lq').value).split(/\s+/).filter(Boolean),out=[];
+  const ok=it=>fl==='fav'?it.fav:fl==='chroma'?it.chroma:fl==='recent'?it.used:['video','audio','image'].includes(fl)?it.type===fl:fl.startsWith('t:')?it.tags.includes(fl.slice(2)):fl.startsWith('f:')?it.folder===fl.slice(2):true;
+  for(const it of items){if(!ok(it))continue;
+    if(qs.every(w=>hit(w,it.name+' '+it.say+' '+it.tags.join(' '))))out.push({it});
+    if(qs.length)it.marks.forEach(mk=>{if(qs.every(w=>hit(w,mk.name)))out.push({it,mk});}); // метки ищутся наравне с футажами
+  }
+  if(fl==='recent')return out.sort((a,b)=>b.it.used-a.it.used).slice(0,10);
+  return out.sort((a,b)=>b.it.added-a.it.added);
+}
+function renderLib(){
+  const ch=[['all','Все'],['fav','Избранное'],['chroma','Хромакей'],['video','Видео'],['audio','Аудио'],['image','Картинки'],['recent','Недавние']];
+  new Set(items.map(i=>i.folder).filter(Boolean)).forEach(f=>ch.push(['f:'+f,f]));
+  new Set(items.flatMap(i=>i.tags)).forEach(x=>ch.push(['t:'+x,'#'+x]));
+  $('lch').innerHTML='';
+  ch.forEach(([k,l])=>{const b=document.createElement('button');b.className='ch'+(k===fl?' on':'');b.textContent=l;b.onclick=()=>{fl=k;renderLib();};$('lch').append(b);});
+  const g=$('lg');g.innerHTML='';
+  if(!items.length){g.innerHTML=`<div class='emp'>Добавьте первые футажи<button class='pri ib' id='le' style='width:56px;border-radius:12px'><i data-i='plus'></i></button></div>`;$('le').firstChild.innerHTML=ic('plus',24,'#000');$('le').onclick=()=>$('lf').click();return;}
+  const rs=results();
+  if(!rs.length){g.innerHTML=`<div class='emp'>Ничего не найдено</div>`;return;}
+  rs.forEach(({it,mk})=>{
+    const d=document.createElement('div');d.className='tile';
+    if(it.thumb)d.style.backgroundImage='url('+it.thumb+')';else d.innerHTML=ic(it.type==='audio'?'note':'layers',28);
+    d.insertAdjacentHTML('beforeend',`<span class='d'>${fmt(mk?mk.b-mk.a:it.dur)}</span><span class='n'></span>`);
+    d.lastChild.textContent=mk?mk.name+' (из: '+it.name+')':it.name;
+    d.onclick=()=>prev(it,mk);g.append(d);
+  });
+}
+function libOpen(){$('lib').classList.add('open');renderLib();space();}
+$('lx').onclick=()=>$('lib').classList.remove('open');
+$('la').onclick=()=>$('lf').click();
+$('lq').oninput=renderLib;
+$('lf').onchange=e=>{const fs=[...e.target.files];e.target.value='';libAdd(fs);};
+
+// --- Добавление: миниатюра, длительность, метка «хромакей» (много зелёного в кадре) ---
+function shot(src,w,h){const c=document.createElement('canvas');c.width=80;c.height=Math.round(80*h/w)||45;c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c;}
+function green(c){try{const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+1]>90&&d[i+1]>d[i]*1.4&&d[i+1]>d[i+2]*1.4)n++;return n/(d.length/4)>.3;}catch(e){return false;}}
+async function prep(f){
+  const type=f.type.split('/')[0];
+  if(!['video','audio','image'].includes(type))throw new Error('format');
+  const it={id:'l'+Date.now()+Math.random().toString(36).slice(2,6),name:f.name.replace(/\.[^.]+$/,''),say:'',tags:[],folder:'',type,dur:3,size:f.size,fav:0,added:Date.now(),uses:0,blob:f,marks:[]},url=URL.createObjectURL(f);
+  if(type==='image'){const im=new Image();im.src=url;await once(im,'load');it.w=im.naturalWidth;it.h=im.naturalHeight;const c=shot(im,it.w,it.h);it.thumb=c.toDataURL('image/jpeg',.7);it.chroma=green(c);}
+  else{const v=document.createElement(type);v.preload='auto';v.muted=true;v.src=url;await once(v,'loadedmetadata');it.dur=isFinite(v.duration)?v.duration:10;
+    if(type==='video'){it.w=v.videoWidth;it.h=v.videoHeight;it.thumb=await thumb(v);it.chroma=green(shot(v,it.w,it.h));}}
+  URL.revokeObjectURL(url);return it;
+}
+async function libAdd(fs){
+  toast('Обработка файлов…');pend=[];
+  for(const f of fs){try{pend.push(await prep(f));}catch(e){toast('Не удалось открыть файл: '+f.name);}}
+  if(pend.length)card(0);
+}
+// Быстрая карточка: название, фраза, теги, папка; «Следующий» перебирает пачку
+function md(html){$('mc').innerHTML=html;$('md').style.display='flex';}
+function closeMd(){$('md').style.display='none';$('mc').innerHTML='';if(mUrl){URL.revokeObjectURL(mUrl);mUrl=null;}}
+function card(i){
+  if(i>=pend.length){pend=[];closeMd();renderLib();space();return;}
+  const it=pend[i],dup=items.find(x=>x.size===it.size&&Math.abs(x.dur-it.dur)<.05);
+  md(`<b>${i+1} / ${pend.length}</b>${it.thumb?`<img src='${it.thumb}'>`:''}<div id='dp' class='wr'></div><input id='fnm' placeholder='Название'><input id='fsy' placeholder='Что говорит'><input id='ftg' placeholder='Теги через запятую'><input id='ffo' list='fdl' placeholder='Папка'><datalist id='fdl'></datalist><div class='row'><button id='fc'>Отмена</button><button id='fd2'>Готово</button><button class='pri' id='fx'>Следующий</button></div>`);
+  $('fnm').value=it.name;$('dp').textContent=dup?'Похоже на дубликат: '+dup.name:'';
+  new Set(items.map(x=>x.folder).filter(Boolean)).forEach(f=>{const o=document.createElement('option');o.value=f;$('fdl').append(o);});
+  const put=x=>{items.push(x);dbPut(x);};
+  const cur=()=>{it.name=$('fnm').value.trim()||it.name;it.say=$('fsy').value.trim();it.tags=$('ftg').value.split(',').map(s=>s.trim()).filter(Boolean);it.folder=$('ffo').value.trim();put(it);};
+  $('fx').onclick=()=>{cur();card(i+1);};
+  $('fd2').onclick=()=>{cur();pend.slice(i+1).forEach(put);card(pend.length);};
+  $('fc').onclick=()=>{pend=[];closeMd();};
+}
+
+// --- Предпросмотр со звуком, избранное, удаление, метки ---
+function prev(it,mk){
+  mUrl=URL.createObjectURL(it.blob);
+  const tag=it.type==='image'?`<img src='${mUrl}'>`:`<${it.type} id='pm' controls playsinline src='${mUrl}'></${it.type}>`;
+  md(tag+`<b id='pn'></b><div id='pq'></div><div class='row'><button class='pri' id='pa'>Добавить</button><button class='ib' id='pf'></button>${it.type==='image'?'':`<button id='pk'>Метки</button>`}<button id='pd'>Удалить</button></div><div id='pmk'></div><button id='px'>Закрыть</button>`);
+  $('pn').textContent=mk?mk.name+' (из: '+it.name+')':it.name;$('pq').textContent=it.say||'';
+  const star=()=>{$('pf').innerHTML=ic('star',22,it.fav?'#4fd1e5':'#fff');};star();
+  $('pa').onclick=()=>{closeMd();insertLib(it,mk);};
+  $('pf').onclick=()=>{it.fav=it.fav?0:1;dbPut(it);star();renderLib();};
+  $('px').onclick=closeMd;
+  let sure=0;$('pd').onclick=()=>{if(!sure){sure=1;$('pd').textContent='Точно удалить?';return;}items=items.filter(x=>x!==it);dbDel(it.id);closeMd();renderLib();};
+  const v=$('pm');
+  if(mk&&v){v.currentTime=mk.a;v.ontimeupdate=()=>{if(v.currentTime>=mk.b)v.pause();};}
+  if($('pk'))$('pk').onclick=()=>marks(it,v);
+}
+// Метки: двигаю ползунок, ставлю «Начало» и «Конец», называю отрезок
+function marks(it,v){
+  let a=0,b=it.dur;
+  $('pmk').innerHTML=`<input type='range' id='mr' min='0' max='${it.dur}' step='0.01' value='0'><div class='row'><button id='ma'>Начало</button><button id='mb'>Конец</button></div><div id='mt' class='wr'></div><input id='mn' placeholder='Название отрезка, например «где»'><button class='pri' id='ms'>Сохранить метку</button><div id='ml'></div>`;
+  const info=()=>{$('mt').textContent='Отрезок: '+a.toFixed(2)+' – '+b.toFixed(2)+' с';};
+  const list=()=>{$('ml').innerHTML='';it.marks.forEach(mk=>{const r=document.createElement('div');r.className='row';r.innerHTML=`<span style='flex:1'></span><button>Удалить</button>`;
+    r.firstChild.textContent=mk.name+' ('+mk.a.toFixed(1)+'–'+mk.b.toFixed(1)+')';
+    r.lastChild.onclick=()=>{it.marks=it.marks.filter(x=>x!==mk);dbPut(it);list();renderLib();};$('ml').append(r);});};
+  v.addEventListener('timeupdate',()=>{const r=$('mr');if(r)r.value=v.currentTime;});
+  $('mr').oninput=e=>{v.currentTime=+e.target.value;};
+  $('ma').onclick=()=>{a=v.currentTime;info();};$('mb').onclick=()=>{b=v.currentTime;info();};
+  $('ms').onclick=()=>{const n=$('mn').value.trim();if(!n)return toast('Назови отрезок, например «где»');if(b<=a)return toast('Конец должен быть позже начала');
+    it.marks.push({id:'k'+Date.now(),name:n,a,b});dbPut(it);$('mn').value='';list();renderLib();toast('Метка сохранена');};
+  info();list();
+}
+
+// --- Вставка в позицию курсора; курсор уходит в конец вставки, так клипы идут подряд ---
+async function insertLib(it,mk){
+  try{
+    let m=libM[it.id];
+    if(!m){m={id:'m'+nid++,type:it.type,name:it.name,url:URL.createObjectURL(it.blob),dur:it.dur,thumb:it.thumb,w:it.w,h:it.h,blob:it.blob};
+      if(it.type==='image'){m.img=new Image();m.img.src=m.url;await once(m.img,'load');}
+      media[m.id]=m;libM[it.id]=m;}
+    const tr=it.type==='audio'?2:0,dur=mk?mk.b-mk.a:m.dur;
+    if(m.w&&!clips.some(c=>c.tr<2)){ratio=[m.w,m.h];fitCanvas();}
+    clips.push({id:'c'+nid++,m:m.id,tr,start:t,in:mk?mk.a:0,dur,ck:it.chroma?{c:[0,255,0],t:.35,s:.2}:undefined}); // хромакей включается сам
+    it.uses=(it.uses||0)+1;it.used=Date.now();dbPut(it);
+    t+=dur;save();build();toast('Добавлено: '+(mk?mk.name:it.name));
+  }catch(e){toast('Не удалось вставить: '+it.name);}
+}
+
+// ===== Этап 2: параметры клипа, хромакей =====
+let pip=false,rec=null,AC=null,stopped=false; // pip — режим пипетки
+const kc={}; // холсты для хромакея (по одному на клип)
+function keyed(c,e,sw,sh){ // убираем выбранный цвет попиксельно, край сглаживаем, зелёную кайму гасим
+  const s=Math.min(1,320/Math.max(sw,sh)),w=Math.round(sw*s),h=Math.round(sh*s),k=kc[c.id]||(kc[c.id]=document.createElement('canvas'));
+  if(k.width!==w||k.height!==h){k.width=w;k.height=h;}
+  const g=k.getContext('2d',{willReadFrequently:true});g.clearRect(0,0,w,h);g.drawImage(e,0,0,w,h);
+  const im=g.getImageData(0,0,w,h),d=im.data,[r0,g0,b0]=c.ck.c,tol=c.ck.t*200,soft=c.ck.s*80+1,gk=g0>r0&&g0>b0;
+  for(let i=0;i<d.length;i+=4){
+    const dist=Math.hypot(d[i]-r0,d[i+1]-g0,d[i+2]-b0);
+    if(dist<tol)d[i+3]=0;else if(dist<tol+soft)d[i+3]=255*(dist-tol)/soft;
+    if(gk&&d[i+3]>0&&d[i+1]>d[i]&&d[i+1]>d[i+2])d[i+1]=(d[i]+d[i+2])/2; // убрать кайму
+  }
+  g.putImageData(im,0,0);return k;
+}
+cv.onpointerdown=e=>{ // пипетка: цвет берём прямо с предпросмотра
+  if(!pip)return;const r=cv.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*cv.width),y=Math.floor((e.clientY-r.top)/r.height*cv.height);
+  const d=cx.getImageData(x,y,1,1).data,c=clips.find(k=>k.id===sel);pip=false;
+  if(c&&c.ck){c.ck.c=[d[0],d[1],d[2]];toast('Цвет выбран');}
+};
+function sliders(box,o,list,fn){ // ползунки: подпись, ползунок, значение, «Сброс»; fn вызывается перед записью
+  list.forEach(([k,l,mn,mx,st,df])=>{
+    const r=document.createElement('div');r.className='sl';
+    r.innerHTML=`<span>${l}</span><input type='range' min='${mn}' max='${mx}' step='${st}'><b></b><button class='ch'>Сброс</button>`;
+    const i=r.children[1],b=r.children[2],show=()=>{i.value=o[k]??df;b.textContent=(+i.value).toFixed(2);};
+    const set=v=>{if(fn)fn(k,v);o[k]=v;show();};
+    i.oninput=()=>set(+i.value);r.children[3].onclick=()=>set(df);show();box.append(r);
+  });
+}
+const PR=[['sc','Масштаб',.1,3,.01,1],['rot','Поворот',-180,180,1,0],['x','Сдвиг X',-1,1,.01,0],['y','Сдвиг Y',-1,1,.01,0],['op','Прозрачность',0,1,.01,1],['sp','Скорость',.25,4,.05,1],['vol','Громкость',0,1,.05,1],['fi','Вход звука, с',0,3,.1,0],['fo','Выход звука, с',0,3,.1,0],['vi','Появл., с',0,3,.1,0],['vo','Исчезн., с',0,3,.1,0],['bri','Яркость',0,2,.01,1],['con','Контраст',0,2,.01,1],['sat','Насыщенность',0,2,.01,1]];
+function props(){
+  const c=clips.find(k=>k.id===sel);if(!c)return toast('Сначала выдели клип');
+  const old=JSON.stringify(c);
+  sheet('Параметры клипа',`<div id='pr'></div><button class='ch' id='pmr'>Отражение</button>`,save,()=>{Object.keys(c).forEach(k=>delete c[k]);Object.assign(c,JSON.parse(old));build();});
+  sliders($('pr'),c,PR,(k,v)=>{if(k==='sp'){c.dur=c.dur*(c.sp||1)/v;build();}}); // смена скорости меняет длину клипа
+  $('pmr').onclick=()=>{c.mir=!c.mir;};
+}
+function chroma(){
+  const c=clips.find(k=>k.id===sel),m=c&&media[c.m];
+  if(!m||m.type==='audio')return toast('Выдели видео или картинку');
+  const old=JSON.stringify(c.ck||null);if(!c.ck)c.ck={c:[0,255,0],t:.35,s:.2};
+  sheet('Хромакей',`<div id='pr'></div><div class='row'><button id='pp'>Пипетка</button><button id='po'>Выключить</button></div>`,()=>{pip=false;save();},()=>{pip=false;c.ck=JSON.parse(old);});
+  sliders($('pr'),c.ck,[['t','Интенсивность',0,1,.01,.35],['s','Сглаживание края',0,1,.01,.2]]);
+  $('pp').onclick=()=>{pip=true;toast('Тапни по цвету фона в предпросмотре');};
+  $('po').onclick=()=>{c.ck=null;pip=false;$('sh').classList.remove('open');save();};
+}
+
+// ===== Этап 3: правка текста (текст, цвет, размер) =====
+function editText(){
+  const c=clips.find(k=>k.id===sel);if(!c||c.tr!==3)return toast('Выдели текстовый клип');
+  md(`<b>Текст</b><input id='tx' placeholder='Текст'><span class='wr'>Цвет</span><input type='color' id='tc' style='padding:0'><span class='wr'>Размер</span><input type='range' id='ts' min='.03' max='.2' step='.005'><span class='wr'>Анимация</span><select id='ta'><option value=''>Нет</option><option value='type'>Печатная машинка</option><option value='rise'>Снизу вверх</option><option value='pulse'>Пульсация</option></select><span class='wr'>Свой шрифт (.ttf, .otf)</span><input type='file' id='tf' accept='.ttf,.otf'><button class='pri' id='tk'>Готово</button>`);
+  $('tx').value=c.text;$('tc').value=c.col||'#ffffff';$('ts').value=c.size||.06;$('ta').value=c.an||'';
+  $('tf').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const nm='f'+Date.now(),ff=new FontFace(nm,await f.arrayBuffer());await ff.load();document.fonts.add(ff);c.font=nm;toast('Шрифт загружен');}catch(er){toast('Не удалось загрузить шрифт: '+f.name);}};
+  $('tk').onclick=()=>{c.text=$('tx').value||'Текст';c.col=$('tc').value;c.size=+$('ts').value;c.an=$('ta').value;closeMd();save();build();};
+}
+
+// ===== Этап 2Б: мемные эффекты (клип на дорожке «эффекты», действует на весь кадр) =====
+const FX=[['accent','Акцент',.5],['shake','Тряска',.6],['zoom','Зум-удар',.3],['flash','Вспышка',.2],['bw','Чёрно-белый',1],['inv','Инверсия',.15],['blur','Размытие',1],['sway','Покачивание',1.5],['pulse','Пульс',2],['glitch','Глитч',.4],['fry','Пережарка',1],['red','Красная вспышка',.2],['vig','Красная виньетка',1.5]];
+function fxSheet(){
+  sheet('Эффекты на курсоре',FX.map(f=>`<button class='ch rt' data-k='${f[0]}'>${f[1]}</button>`).join('')+`<button class='ch' id='fch'>Чат Террарии</button>`);$('fch').onclick=chatDlg;
+  const fc=document.createElement('button');fc.className='ch';fc.textContent='Свой код';$('shb').append(fc);
+  fc.onclick=()=>{const id='c'+nid++;clips.push({id,tr:4,start:t,in:0,dur:2,fxn:'code',text:'Свой код',code:CODE0});sel=id;save();build();$('sh').classList.remove('open');codeEdit();};
+  $('shb').querySelectorAll('.rt').forEach(b=>b.onclick=()=>{const f=FX.find(x=>x[0]===b.dataset.k);
+    clips.push({id:'c'+nid++,tr:4,start:t,in:0,dur:f[2],fxn:f[0],text:f[1]});save();build();toast('Добавлен эффект: '+f[1]);});
+}
+
+// ===== Этап 8: экспорт в MP4/WebM со звуком, кнопка «Экспорт» показывает прогресс и отменяет =====
+async function saveFile(name,data){
+  try{const d=window.claude&&await claude.use('downloads');
+    if(d){await d.save({filename:name,data});toast('Готово: '+name);return;}}
+  catch(e){toast(e&&e.code==='declined'?'Сохранение отменено':e&&e.code==='rejected_extension'?'Этот формат нельзя сохранить из опубликованной страницы (в файле на устройстве работает)':'Не удалось сохранить: '+((e&&e.message)||e));return;}
+  const a=document.createElement('a');a.href=URL.createObjectURL(data);a.download=name;a.click();toast('Готово: '+name); // обычный запуск файла
+}
+async function exportVideo(){
+  if(rec){stopped=true;rec.stop();return;} // повторное нажатие = отмена
+  if(!total())return toast('Нечего экспортировать: добавь клипы');
+  if(!window.MediaRecorder||!cv.captureStream)return toast('Этот браузер не умеет записывать видео');
+  const mt=['video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
+  if(!mt)return toast('Формат записи не поддерживается');
+  const ext=mt.startsWith('video/mp4')?'mp4':'webm';
+  if(ext==='webm')toast('MP4 здесь не поддерживается, сохраню WebM');
+  pause();t=0;const mu=muted;muted=false;stopped=false;
+  const stream=cv.captureStream(30);
+  try{ // звук всех клипов собираем в один поток
+    AC=AC||new AudioContext();await AC.resume();const dst=AC.createMediaStreamDestination();
+    clips.forEach(c=>{const m=media[c.m];if(!m||m.type==='image')return;const e=el(c);if(!e.srcNode){e.srcNode=AC.createMediaElementSource(e);e.srcNode.connect(AC.destination);}e.srcNode.connect(dst);});
+    dst.stream.getAudioTracks().forEach(a=>stream.addTrack(a));
+  }catch(e){toast('Звук подключить не удалось, запишу без звука');}
+  const parts=[];rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:res===1080?8e6:5e6});
+  rec.ondataavailable=e=>{if(e.data.size)parts.push(e.data);};
+  const iv=setInterval(()=>{$('exp').textContent=Math.round(t/total()*100)+'% · отмена';if(!playing)rec.stop();},250);
+  rec.onstop=()=>{clearInterval(iv);rec=null;muted=mu;pause();$('exp').textContent='Экспорт';if(!stopped)saveFile('video.'+ext,new Blob(parts,{type:mt}));else toast('Экспорт отменён');};
+  rec.start(500);toggle();
+}
+
+// ===== Режимы наложения и чат Террарии =====
+const BM=[['source-over','Обычный'],['multiply','Умножение'],['screen','Экран'],['overlay','Наложение'],['lighten','Осветление'],['darken','Затемнение']];
+function blendSheet(){
+  const c=clips.find(k=>k.id===sel);if(!c)return toast('Сначала выдели клип');
+  const old=c.bm;
+  sheet('Режим наложения',BM.map(b=>`<button class='ch rt' data-m='${b[0]}'>${b[1]}</button>`).join(''),save,()=>{c.bm=old;});
+  $('shb').querySelectorAll('.rt').forEach(b=>b.onclick=()=>{c.bm=b.dataset.m;});
+}
+function chatDlg(){ // сообщения чата: белый текст с чёрной обводкой слева внизу
+  md(`<b>Сообщения чата</b><input id='cn' placeholder='Имя игрока'><button class='ch' data-t='0'>Имя присоединился к игре</button><button class='ch' data-t='1'>Имя был разорван на куски</button><button class='ch' data-t='2'>Босс пробуждён!</button><button class='ch' data-t='3'>Все три подряд</button><button id='cc'>Закрыть</button>`);
+  const L=n=>[n+' присоединился к игре',n+' был разорван на куски','Босс пробуждён!'];
+  $('mc').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+    const n=$('cn').value||'Игрок',k=+b.dataset.t,ls=k===3?L(n):[L(n)[k]];
+    ls.forEach((line,i)=>clips.push({id:'c'+nid++,tr:4,start:t+i*.8,in:0,dur:5,fxn:'chat',text:'Чат',line}));
+    save();build();closeMd();});
+  $('cc').onclick=closeMd;
+}
+
+// ===== Этапы 5 и 6: 3D-сцена на Three.js r128 (подключается при первом нажатии «3D») =====
+// 3D-сцена — клип на дорожке «эффекты» (fxn:'3d'); всё её содержимое лежит в c.sc3, поэтому работает отмена
+let R3=null,cache={},tab3='o',s3=null,on3=false,d3=null,cur3=null;
+const D=Math.PI/180;
+function load3(){
+  if(window.THREE)return Promise.resolve();
+  return new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';s.onload=ok;s.onerror=()=>no(new Error('3d'));document.head.append(s);});
+}
+const c3=()=>clips.find(k=>k.fxn==='3d'&&k.id===sel)||clips.find(k=>k.fxn==='3d'&&t>=k.start&&t<k.start+k.dur);
+function orb(m){return new THREE.Vector3(Math.sin(m.a*D)*Math.cos(m.e*D),Math.sin(m.e*D),Math.cos(m.a*D)*Math.cos(m.e*D)).multiplyScalar(m.d);}
+function mk3(o,src){ // создаём объект: куб, шар, плоскость, цилиндр или плоскость с картинкой/видео
+  const g={cube:()=>new THREE.BoxGeometry(1,1,1),sphere:()=>new THREE.SphereGeometry(.6,24,16),plane:()=>new THREE.PlaneGeometry(2,2),cyl:()=>new THREE.CylinderGeometry(.5,.5,1.2,24),layer:()=>new THREE.PlaneGeometry(2,2),text:()=>new THREE.PlaneGeometry(4,1)}[o.kind]();
+  if(o.kind==='text'){const cc=document.createElement('canvas');cc.width=512;cc.height=128;const g2=cc.getContext('2d');g2.font='bold 84px sans-serif';g2.textAlign='center';g2.fillStyle='#fff';g2.strokeStyle='#000';g2.lineWidth=6;g2.strokeText(o.txt,256,92);g2.fillText(o.txt,256,92);
+    return new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cc),transparent:true,side:THREE.DoubleSide,color:o.col}));}
+  if(o.kind==='layer'){const e=el(src),tx=media[src.m].type==='video'?new THREE.VideoTexture(e):new THREE.Texture(e);
+    return new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tx,transparent:true,side:THREE.DoubleSide}));}
+  return new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:o.col,side:THREE.DoubleSide}));
+}
+function r3(c,W,H){ // рисуем сцену в момент t и отдаём холст
+  if(!window.THREE||R3===false)return null;
+  if(!R3){try{R3=new THREE.WebGLRenderer({alpha:true,antialias:true});R3.setClearColor(0x000000,0);}catch(e){R3=false;toast('WebGL недоступен в этом браузере');return null;}}
+  if(R3.domElement.width!==W||R3.domElement.height!==H)R3.setSize(W,H,false);
+  const S=c.sc3,tt=t-c.start,Lg=S.light,cm=S.cam;let K=cache[c.id];
+  if(!K){K=cache[c.id]={scene:new THREE.Scene(),m:{},amb:new THREE.AmbientLight(0xffffff),dir:new THREE.DirectionalLight(0xffffff),cam:new THREE.PerspectiveCamera(50,W/H,.1,200)};K.scene.add(K.amb,K.dir);}
+  K.amb.intensity=Lg.a;K.dir.intensity=Lg.d;K.dir.color.set(Lg.c);K.dir.position.set(Lg.lx,Lg.ly,Lg.lz);
+  Object.keys(K.m).forEach(id=>{if(!S.objs.some(o=>o.id===id)){K.scene.remove(K.m[id]);delete K.m[id];}});
+  for(const o of S.objs){
+    const src=o.src&&clips.find(k=>k.id===o.src);if(o.kind==='layer'&&!src)continue;
+    const m=K.m[o.id]||(K.m[o.id]=mk3(o,src));if(!m.parent)K.scene.add(m);
+    m.position.set(o.x+o.vx*tt,o.y+o.vy*tt,o.z+o.vz*tt); // скорость движения и вращения заменяют ключевые кадры
+    m.rotation.set(o.rx*D,(o.ry+o.rv*tt)*D,o.rz*D);
+    if(o.kind==='layer'){const e=el(src),w=e.videoWidth||e.naturalWidth,h=e.videoHeight||e.naturalHeight;m.scale.set(o.s*(w&&h?w/h:1),o.s,1);const e2=el(src),ct=e2.currentTime||0;if(m.userData.ct!==ct){m.userData.ct=ct;m.material.map.needsUpdate=true;}}
+    else{m.scale.set(o.s,o.s,o.s);m.material.color.set(o.col);}
+  }
+  // Камера: свободный облёт или привязка к объекту (дочерняя или режим «окно»)
+  const cam=K.cam,tp=new THREE.Vector3(),tq=new THREE.Quaternion(),up=new THREE.Vector3(0,1,0),ob=cm.att&&K.m[cm.att];
+  cam.fov=cm.fov;cam.aspect=W/H;cam.updateProjectionMatrix();
+  if(ob){ob.updateMatrixWorld();const wp=ob.getWorldPosition(new THREE.Vector3()),wq=ob.getWorldQuaternion(new THREE.Quaternion());
+    if(cm.win){tp.copy(wp);tq.copy(wq);} // «окно»: камера в центре картинки, смотрит сквозь неё
+    else{tp.copy(wp).add(orb(cm).applyQuaternion(wq));tq.setFromRotationMatrix(new THREE.Matrix4().lookAt(tp,wp,up));}}
+  else{tp.copy(orb(cm));tq.setFromRotationMatrix(new THREE.Matrix4().lookAt(tp,new THREE.Vector3(),up));}
+  const f=1-cm.sm; // сглаживание движения камеры
+  if(!K.init||f>=1){cam.position.copy(tp);cam.quaternion.copy(tq);K.init=1;}else{cam.position.lerp(tp,f);cam.quaternion.slerp(tq,f);}
+  K.scene.background=S.sky?new THREE.Color(S.sky):null;R3.render(K.scene,cam);return R3.domElement;
+}
+function open3(){
+  load3().then(()=>{
+    let c=c3();
+    if(!c){c={id:'c'+nid++,tr:4,start:t,in:0,dur:5,fxn:'3d',text:'3D-сцена',sc3:{objs:[],light:{a:.7,d:1,lx:3,ly:5,lz:4,c:'#ffffff'},cam:{fov:50,d:6,a:0,e:15,sm:0,att:null,win:false}}};clips.push(c);save();build();}
+    enter3(c);
+  }).catch(()=>toast('Не удалось загрузить Three.js: нужен доступ к cdnjs.cloudflare.com'));
+}
+function sheet3(){ // шторка с вкладками «Объекты», «Свет», «Камера»
+  const c=m3?cur3:c3(),S=c.sc3,old=JSON.stringify(S);cur3=c;on3=true;
+  sheet('3D-сцена (облёт камеры — пальцем по предпросмотру)',`<div class='row' id='tb3'></div><div id='b3'></div>`,()=>{on3=false;save();},()=>{on3=false;c.sc3=JSON.parse(old);delete cache[c.id];});
+  const NM={cube:'Куб',sphere:'Шар',plane:'Плоскость',cyl:'Цилиндр',layer:'Слой',text:'Текст'};
+  const addObj=(kind,src)=>{const o={id:'o'+nid++,kind,src,col:'#4fd1e5',x:0,y:0,z:0,rx:0,ry:0,rz:0,s:1,vx:0,vy:0,vz:0,rv:0};S.objs.push(o);s3=o.id;};
+  const show=()=>{
+    const tb=$('tb3'),B=$('b3');tb.innerHTML='';B.innerHTML='';
+    [['o','Объекты'],['l','Свет'],['c','Камера']].forEach(([k,l])=>{const b=document.createElement('button');b.className='ch'+(tab3===k?' on':'');b.textContent=l;b.onclick=()=>{tab3=k;show();};tb.append(b);});
+    const bt=(l,f)=>{const b=document.createElement('button');b.className='ch';b.textContent=l;b.onclick=()=>{f();show();};B.append(b);};
+    if(tab3==='o'){
+      ['cube','sphere','plane','cyl'].forEach(k=>bt('+ '+NM[k],()=>addObj(k)));
+      bt('+ Выделенный клип как плоскость',()=>{const k=clips.find(q=>q.id===sel),m=k&&media[k.m];if(!m||m.type==='audio')return toast('Выдели на таймлайне видео или картинку');addObj('layer',k.id);});
+      S.objs.forEach(o=>{const b=document.createElement('button');b.className='ch'+(s3===o.id?' on':'');b.textContent=NM[o.kind];b.onclick=()=>{s3=o.id;show();};B.append(b);});
+      const o=S.objs.find(q=>q.id===s3);
+      if(o){const box=document.createElement('div');B.append(box);
+        sliders(box,o,[['x','X',-5,5,.05,0],['y','Y',-5,5,.05,0],['z','Z',-5,5,.05,0],['rx','Поворот X',-180,180,1,0],['ry','Поворот Y',-180,180,1,0],['rz','Поворот Z',-180,180,1,0],['s','Масштаб',.1,4,.05,1],['vx','Движ. X/с',-3,3,.05,0],['vy','Движ. Y/с',-3,3,.05,0],['vz','Движ. Z/с',-3,3,.05,0],['rv','Вращ. °/с',-360,360,5,0]]);
+        if(o.kind!=='layer'){const ci=document.createElement('input');ci.type='color';ci.value=o.col;ci.oninput=()=>{o.col=ci.value;};B.append(ci);}
+        bt('Удалить объект',()=>{S.objs=S.objs.filter(q=>q!==o);if(S.cam.att===o.id)S.cam.att=null;s3=null;});}
+    }else if(tab3==='l'){
+      sliders(B,S.light,[['a','Рассеянный',0,2,.05,.7],['d','Направленный',0,3,.05,1],['lx','Свет X',-10,10,.1,3],['ly','Свет Y',-10,10,.1,5],['lz','Свет Z',-10,10,.1,4]]);
+      const ci=document.createElement('input');ci.type='color';ci.value=S.light.c;ci.oninput=()=>{S.light.c=ci.value;};B.append(ci);
+    }else{
+      const cm=S.cam;
+      sliders(B,cm,[['fov','Угол обзора',20,120,1,50],['d','Дистанция',1,20,.1,6],['a','Облёт гор.',-180,180,1,0],['e','Облёт верт.',-85,85,1,15],['sm','Сглаживание',0,.95,.05,0]]);
+      bt('Привязать камеру к объекту…',()=>objWin(S,'attach')); // окно со списком объектов
+      bt(cm.win?'Режим «окно»: включён':'Режим «окно»: выключен',()=>{cm.win=!cm.win;});
+      bt('Отвязать',()=>{cm.att=null;});
+      bt('Вернуть в исходное',()=>{Object.assign(cm,{fov:50,d:6,a:0,e:15,sm:0,att:null,win:false});});
+    }
+  };
+  show();
+}
+// Облёт камеры одним пальцем по предпросмотру, пока открыта шторка 3D
+cv.addEventListener('pointerdown',e=>{if(!on3||!cur3||pip)return;const m=cur3.sc3.cam;d3={x:e.clientX,y:e.clientY,a:m.a,e:m.e,m};cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{if(!d3)return;d3.m.a=d3.a-(e.clientX-d3.x)*.5;d3.m.e=Math.max(-85,Math.min(85,d3.e+(e.clientY-d3.y)*.5));});
+cv.addEventListener('pointerup',()=>{d3=null;});
+
+// ===== Этап 7: мини-сэмплер (сэмпл + .mid; разные ноты = разная скорость воспроизведения) =====
+let SMP=[],TK=[],cs=-1,mtot=1,srcs=[],gns=[],ptimer=0,pstart=0,raf=0;const sp={tempo:100,loop:false,play:false}; // SMP — сэмплы, TK — дорожки MIDI
+const loadJs=u=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>no(new Error('Не удалось загрузить '+u));document.head.append(s);});
+const fpick=a=>new Promise(ok=>{const i=document.createElement('input');i.type='file';i.accept=a;i.onchange=()=>i.files[0]&&ok(i.files[0]);i.click();});
+async function decode(blob){AC=AC||new AudioContext();await AC.resume();return AC.decodeAudioData(await blob.arrayBuffer());}
+function addSmp(name,buf){SMP.push({name,buf,a:0,b:buf.duration,root:60});cs=SMP.length-1;}
+const aud=k=>(TK.some(x=>x.solo)?k.solo:!k.mute)?k.vol:0; // слышно ли дорожку (соло/выкл)
+const applyG=()=>gns.forEach((g,i)=>{g.gain.value=aud(TK[i]);});
+async function loadMidi(f){
+  if(!window.Midi)await loadJs('https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/build/Midi.js');
+  const MC=window.Midi.Midi||window.Midi,m=new MC(await f.arrayBuffer());
+  TK=m.tracks.filter(x=>x.notes.length).map((x,i)=>({name:x.name||(x.instrument&&x.instrument.name)||'Дорожка '+(i+1),notes:x.notes.map(n=>[n.time,n.duration,n.midi,n.velocity]),vol:1,solo:false,mute:false,si:0}));
+  if(!TK.length)throw new Error('В файле нет нот');
+  mtot=Math.max(.1,...TK.flatMap(k=>k.notes.map(n=>n[0]+n[1])));
+}
+function sched(ctx,dest,p,t0){ // расставляем все ноты по времени; p — темп (1 = как в файле)
+  const out=[],gs=TK.map(k=>{const g=ctx.createGain();g.gain.value=aud(k);g.connect(dest);return g;});
+  TK.forEach((k,i)=>{const s=SMP[k.si];if(!s)return;
+    k.notes.forEach(([tm,du,n,v])=>{const r=ctx.createBufferSource(),e=ctx.createGain();
+      r.buffer=s.buf;r.playbackRate.value=2**((n-s.root)/12);e.gain.value=v;r.connect(e);e.connect(gs[i]);
+      r.start(t0+tm/p,s.a,Math.max(.05,s.b-s.a));out.push(r);});});
+  return{srcs:out,gains:gs};
+}
+async function splay(){
+  if(sp.play){sstop();return;}
+  if(!SMP.length||!TK.length)return toast('Загрузи сэмпл и .mid');
+  await AC.resume();const p=sp.tempo/100,t0=AC.currentTime+.1,o=sched(AC,AC.destination,p,t0);
+  srcs=o.srcs;gns=o.gains;sp.play=true;pstart=t0;
+  ptimer=setTimeout(()=>{sstop();if(sp.loop)splay();},(mtot/p+1)*1000); // зацикливание
+  roll();
+}
+function sstop(){sp.play=false;clearTimeout(ptimer);srcs.forEach(r=>{try{r.stop();}catch(e){}});srcs=[];}
+function roll(){ // piano roll: ноты и бегущая линия
+  const c=$('pr2');if(!c||!TK.length)return;const g=c.getContext('2d'),W=c.width,H=c.height,all=TK.flatMap(k=>k.notes);
+  const lo=Math.min(...all.map(n=>n[2]))-1,hi=Math.max(...all.map(n=>n[2]))+1,p=sp.tempo/100;
+  g.fillStyle='#111';g.fillRect(0,0,W,H);
+  TK.forEach((k,i)=>{g.fillStyle=['#4fd1e5','#f0b429','#e05d8f','#7bd88f'][i%4];k.notes.forEach(([tm,du,n])=>g.fillRect(tm/mtot*W,H-(n-lo)/(hi-lo)*H,Math.max(2,du/mtot*W),Math.max(2,H/(hi-lo))));});
+  if(sp.play){g.fillStyle='#fff';g.fillRect(Math.min(1,(AC.currentTime-pstart)*p/mtot)*W,0,2,H);cancelAnimationFrame(raf);raf=requestAnimationFrame(roll);}
+}
+async function srender(){ // микс в аудиобуфер без воспроизведения
+  if(!SMP.length||!TK.length)throw new Error('Загрузи сэмпл и .mid');
+  const p=sp.tempo/100,sr=44100,off=new OfflineAudioContext(2,Math.ceil(sr*(mtot/p+3)),sr);
+  sched(off,off.destination,p,0);return off.startRendering();
+}
+// SF2: сюда позже добавить экспорт SoundFont (.sf2) из SMP и TK
+function wav(b){ // буфер → WAV 16 бит
+  const n=b.length,ch=b.numberOfChannels,v=new DataView(new ArrayBuffer(44+n*ch*2)),w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
+  w(0,'RIFF');v.setUint32(4,36+n*ch*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);
+  v.setUint32(24,b.sampleRate,true);v.setUint32(28,b.sampleRate*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*ch*2,true);
+  const d=[...Array(ch).keys()].map(i=>b.getChannelData(i));let o=44;
+  for(let i=0;i<n;i++)for(let c=0;c<ch;c++){const x=Math.max(-1,Math.min(1,d[c][i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2;}
+  return new Blob([v],{type:'audio/wav'});
+}
+async function stoTl(){ // готовый микс — клипом на аудиодорожку
+  toast('Собираю звук…');
+  const wb=wav(await srender()),url=URL.createObjectURL(wb),a=new Audio(url);await once(a,'loadedmetadata');
+  const m={id:'m'+nid++,type:'audio',name:'Сэмплер',url,dur:a.duration,blob:wb};media[m.id]=m;
+  clips.push({id:'c'+nid++,m:m.id,tr:2,start:t,in:0,dur:m.dur});save();build();toast('Добавлено на аудиодорожку');
+}
+function sampler(){
+  sheet('Мини-сэмплер',`<div id='sm'></div>`,sstop,sstop);
+  let lb=false;const B=$('sm');
+  const bt=(l,f,on)=>{const b=document.createElement('button');b.className='ch'+(on?' on':'');b.textContent=l;
+    b.onclick=async()=>{try{await f();}catch(e){toast('Ошибка: '+((e&&e.message)||e));}show();};B.append(b);};
+  const show=()=>{
+    B.innerHTML='';
+    bt('+ Сэмпл (файл)',async()=>{const f=await fpick('audio/*,video/*');addSmp(f.name.replace(/\.[^.]+$/,''),await decode(f));});
+    bt('Из библиотеки',()=>{lb=!lb;},lb);
+    bt('Загрузить .mid',async()=>loadMidi(await fpick('.mid,.midi')));
+    if(lb)items.filter(i=>i.type!=='image').forEach(it=>bt(it.name,async()=>{addSmp(it.name,await decode(it.blob));lb=false;}));
+    SMP.forEach((s,i)=>bt('Сэмпл '+(i+1)+': '+s.name,()=>{cs=i;},i===cs));
+    if(cs>=0){const s=SMP[cs],d=s.buf.duration;
+      sliders(B,s,[['a','Начало, с',0,d,.01,0],['b','Конец, с',0,d,.01,d],['root','Нота (60=До)',24,96,1,60]]); // обрезка и корневая нота
+      bt('Слушать сэмпл',()=>{const r=AC.createBufferSource();r.buffer=s.buf;r.connect(AC.destination);r.start(0,s.a,Math.max(.05,s.b-s.a));});}
+    TK.forEach((k,i)=>{
+      bt('Дорожка '+(i+1)+': '+k.name+' → сэмпл '+(k.si+1),()=>{k.si=(k.si+1)%Math.max(1,SMP.length);}); // нажатие меняет сэмпл дорожки
+      sliders(B,k,[['vol','Громкость',0,1,.05,1]],(kk,v)=>{k[kk]=v;setTimeout(applyG);});
+      bt('Соло',()=>{k.solo=!k.solo;applyG();},k.solo);bt('Выкл',()=>{k.mute=!k.mute;applyG();},k.mute);});
+    if(TK.length){
+      sliders(B,sp,[['tempo','Темп, %',50,200,5,100]]);
+      bt('Зациклить',()=>{sp.loop=!sp.loop;},sp.loop);bt(sp.play?'Стоп':'Играть',splay);
+      const c=document.createElement('canvas');c.id='pr2';c.width=360;c.height=90;c.style.width='100%';B.append(c);roll();
+      bt('Экспорт WAV',async()=>saveFile('sampler.wav',wav(await srender())));bt('На таймлайн',stoTl);}
+  };
+  show();
+}
+
+// ===== Автосохранение проекта в IndexedDB: клипы и файлы, при открытии всё возвращается =====
+let pdb=null,ptm=0,pdone={},pready=false; // pdone — файлы, уже записанные в хранилище
+function pOpen(){return new Promise(ok=>{try{const r=indexedDB.open('capcutproj',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>ok(r.result);r.onerror=()=>ok(null);}catch(e){ok(null);}});}
+function pSave(){
+  clearTimeout(ptm);
+  ptm=setTimeout(()=>{
+    if(!pready){pSave();return;}if(!pdb)return;
+    try{const tx=pdb.transaction('p','readwrite'),os=tx.objectStore('p');
+      Object.values(media).forEach(m=>{if(m.blob&&!pdone[m.id]&&clips.some(c=>c.m===m.id)){os.put({id:m.id,type:m.type,name:m.name,dur:m.dur,thumb:m.thumb,w:m.w,h:m.h,blob:m.blob},'m:'+m.id);pdone[m.id]=1;}});
+      os.put({clips,ratio,res,nid},'cur');
+      tx.onabort=()=>toast('Автосохранение не удалось (возможно, нет места)');
+    }catch(e){toast('Автосохранение недоступно');}
+  },800);
+}
+async function pLoad(){
+  pdb=await pOpen();
+  if(!pdb){pready=true;toast('Хранилище недоступно: проект не будет сохраняться');return;}
+  try{
+    const get=k=>new Promise((ok,no)=>{const q=pdb.transaction('p').objectStore('p').get(k);q.onsuccess=()=>ok(q.result);q.onerror=no;});
+    const s=await get('cur');
+    if(s&&s.clips&&s.clips.length){
+      for(const id of new Set(s.clips.map(c=>c.m).filter(Boolean))){
+        const r=await get('m:'+id);if(!r)continue;
+        const m={...r,url:URL.createObjectURL(r.blob)};
+        if(m.type==='image'){m.img=new Image();m.img.src=m.url;await once(m.img,'load');}
+        media[id]=m;pdone[id]=1;
+      }
+      clips=s.clips.filter(c=>!c.m||media[c.m]);ratio=s.ratio;res=s.res||res;nid=Math.max(nid,s.nid||1);t=0;sel=null;
+      rsLabel();fitCanvas();save();build();toast('Проект восстановлен');
+    }
+  }catch(e){toast('Не удалось восстановить проект');}
+  pready=true;
+}
+function newProj(){
+  pause();clips=[];media={};els={};libM={};sel=null;t=0;pdone={};ratio=[9,16];
+  Object.keys(kc).forEach(k=>delete kc[k]);cache={};hist.length=0;hi=-1;save();fitCanvas();build();
+  if(pdb)try{pdb.transaction('p','readwrite').objectStore('p').clear();}catch(e){}
+  toast('Новый проект');
+}
+function projSheet(){ // кнопка «×» вверху слева
+  sheet('Проект',`<button class='ch' id='pp1'>Сохранить кадр (PNG)</button><button class='ch' id='pp2'>Новый проект</button><button class='ch' id='pp4'>В главное меню</button><div class='wr' id='pp3'></div>`);
+  $('pp4').onclick=()=>{$('sh').classList.remove('open');homeShow();};
+  $('pp1').onclick=()=>{nofr=true;draw();cv.toBlob(b=>{nofr=false;b?saveFile('frame.png',b):toast('Не удалось снять кадр');});};
+  let sure=0;$('pp2').onclick=()=>{if(!sure){sure=1;$('pp2').textContent='Точно очистить проект?';return;}newProj();$('sh').classList.remove('open');};
+  $('pp3').textContent='Проект сохраняется сам и вернётся при следующем открытии.';
+}
+
+// ===== Жесты в предпросмотре: тап выделяет клип, палец двигает, два пальца масштабируют и вращают =====
+const sg={x:false,y:false,r:false},HB={},ptr=new Map();let gs=null,nofr=false,wt=0; // HB — рамки клипов на кадре
+function selFrame(){ // белая рамка с угловыми маркерами у выделенного клипа (в экспорт не попадает)
+  const b=sel&&HB[sel];if(!b||rec||nofr)return;
+  const cc=cutM&&clips.find(k=>k.id===cutM);if(cc&&cc.id===sel&&cc.cut.p.length){const q=cc.cut.p.map(([u,v])=>{const lx=((cc.mir?1-u:u)-.5)*b.w,ly=(v-.5)*b.h;return[b.x+lx*Math.cos(b.r)-ly*Math.sin(b.r),b.y+lx*Math.sin(b.r)+ly*Math.cos(b.r)];});
+    cx.save();cx.strokeStyle=cx.fillStyle='#ffd400';cx.lineWidth=Math.max(2,cv.width*.005);cx.beginPath();q.forEach((p,i)=>i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]));cx.stroke();q.forEach(p=>{cx.beginPath();cx.arc(p[0],p[1],cv.width*.014,0,7);cx.fill();});cx.restore();}
+  if(cutA){const R=cv.width*.17,z=3,lx=cutA.x<cv.width/2?cv.width-R-10:R+10,ly=R+10; // лупа ×3 в углу: видно, куда попадает точка
+    cx.save();cx.beginPath();cx.arc(lx,ly,R,0,7);cx.clip();cx.fillStyle='#000';cx.fillRect(lx-R,ly-R,2*R,2*R);cx.drawImage(cv,cutA.x-R/z,cutA.y-R/z,2*R/z,2*R/z,lx-R,ly-R,2*R,2*R);cx.restore();
+    cx.save();cx.strokeStyle='#fff';cx.lineWidth=4;cx.beginPath();cx.arc(lx,ly,R,0,7);cx.stroke();cx.strokeStyle='#ffd400';cx.lineWidth=2;cx.beginPath();cx.moveTo(lx-16,ly);cx.lineTo(lx+16,ly);cx.moveTo(lx,ly-16);cx.lineTo(lx,ly+16);cx.stroke();cx.restore();}
+
+  if(sg.x||sg.y){cx.save();cx.strokeStyle='#4fd1e5';cx.lineWidth=Math.max(2,cv.width*.004);cx.beginPath();if(sg.x){cx.moveTo(cv.width/2,0);cx.lineTo(cv.width/2,cv.height);}if(sg.y){cx.moveTo(0,cv.height/2);cx.lineTo(cv.width,cv.height/2);}cx.stroke();cx.restore();}
+  cx.save();cx.translate(b.x,b.y);cx.rotate(b.r);cx.strokeStyle=sg.r?'#4fd1e5':'#fff';cx.lineWidth=Math.max(2,cv.width*.004);cx.strokeRect(-b.w/2,-b.h/2,b.w,b.h);
+  const q=cv.width*.025;cx.fillStyle='#fff';[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([i,j])=>cx.fillRect(i*b.w/2-q/2,j*b.h/2-q/2,q,q));cx.restore();
+}
+function hitSel(px,py){const c=clips.find(k=>k.id===sel),b=c&&HB[c.id];if(!b||t<c.start||t>=c.start+c.dur)return null;
+  const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r),lx=dx*co-dy*si,ly=dx*si+dy*co;return Math.abs(lx)<=b.w/2+12&&Math.abs(ly)<=b.h/2+12?c:null;}
+function hitTest(px,py){ // что лежит под пальцем: сверху вниз текст, наложения, основная
+  for(const tr of [3,1,0])for(const c of clips.slice().reverse()){
+    const b=HB[c.id];if(c.tr!==tr||!b||t<c.start||t>=c.start+c.dur)continue;
+    const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r),lx=dx*co-dy*si,ly=dx*si+dy*co;
+    if(Math.abs(lx)<=b.w/2&&Math.abs(ly)<=b.h/2)return c;
+  }
+  return null;
+}
+const cpos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*cv.width,(e.clientY-r.top)/r.height*cv.height];};
+const pst=c=>({x:c.x||0,y:c.y||0,sc:c.sc||1,rot:c.rot||0,size:c.size||.06});
+cv.addEventListener('pointerdown',e=>{
+  if(cutM){cutDown(e);return;}
+  if(pip||on3)return;cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);
+  const c=clips.find(k=>k.id===sel);
+  if(ptr.size===1){const [px,py]=cpos(e),h=hitSel(px,py)||hitTest(px,py);
+    if(h){if(h.id!==sel)select(h.id);kfBake(h);gs={c:h,x0:e.clientX,y0:e.clientY,s:pst(h),moved:false};}
+    else{gs=null;if(sel)select(null);}
+  }else if(ptr.size===2&&c){kfBake(c);const [a,b]=[...ptr.values()];gs={c,pinch:true,d0:Math.hypot(a[0]-b[0],a[1]-b[1])||1,a0:Math.atan2(b[1]-a[1],b[0]-a[0]),s:pst(c),moved:true};}
+},true);
+cv.addEventListener('pointermove',e=>{
+  if(!ptr.has(e.pointerId)||!gs||on3)return;ptr.set(e.pointerId,[e.clientX,e.clientY]);const c=gs.c,r=cv.getBoundingClientRect();
+  if(gs.pinch&&ptr.size>=2){const [a,b]=[...ptr.values()],k=(Math.hypot(a[0]-b[0],a[1]-b[1])||1)/gs.d0;
+    if(c.tr===3)c.size=Math.max(.02,Math.min(.3,gs.s.size*k)); // у текста два пальца меняют размер
+    else{c.sc=Math.max(.05,Math.min(8,gs.s.sc*k));let r=gs.s.rot+(Math.atan2(b[1]-a[1],b[0]-a[0])-gs.a0)*180/Math.PI;const q=Math.round(r/45)*45;sg.r=Math.abs(r-q)<4;if(sg.r)r=q;c.rot=r;}
+  }else if(!gs.pinch&&ptr.size===1){const dx=(e.clientX-gs.x0)/r.width,dy=(e.clientY-gs.y0)/r.height;
+    if(Math.abs(dx)+Math.abs(dy)>.005)gs.moved=true;
+    if(gs.moved){let nx=gs.s.x+dx,ny=gs.s.y+dy;sg.x=Math.abs(nx)<.015;sg.y=Math.abs(ny)<.015;if(sg.x)nx=0;if(sg.y)ny=0;c.x=nx;c.y=ny;}}
+  if(gs&&gs.c&&gs.c.kf)kfSync(gs.c);
+});
+const gend=e=>{ptr.delete(e.pointerId);sg.x=sg.y=sg.r=false;if(!gs)return;if(gs.pinch||!ptr.size){if(gs.moved)save();gs=null;}};
+cv.addEventListener('pointerup',gend);cv.addEventListener('pointercancel',gend);
+cv.addEventListener('wheel',e=>{ // колесо мыши — масштаб выделенного клипа
+  const c=clips.find(k=>k.id===sel);if(!c)return;e.preventDefault();const k=e.deltaY<0?1.08:.93;
+  if(c.tr===3)c.size=Math.max(.02,Math.min(.3,(c.size||.06)*k));else c.sc=Math.max(.05,Math.min(8,kv(c,'sc',c.sc||1)*k));
+  clearTimeout(wt);wt=setTimeout(save,400);
+},{passive:false});
+
+// ===== Маска (круг, прямоугольник, сердце, инверсия) =====
+// ===== Вырез: ставишь точки кисточкой, по ним вырезается часть клипа =====
+let cutM=null; // id клипа, у которого сейчас ставим точки
+function cutPath(k,w,h){
+  const P=k.p.map(([u,v])=>[(u-.5)*w,(v-.5)*h]),line=k.m==='top'||k.m==='bot';
+  if(P.length<(line?2:3))return;
+  let Q=P.slice();
+  if(line){const sg=P[P.length-1][0]>=P[0][0]?1:-1,y=k.m==='top'?-h:h; // линию тянем до краёв, потом до верха или низа
+    Q.unshift([-sg*w,P[0][1]]);Q.push([sg*w,P[P.length-1][1]]);Q.push([Q[Q.length-1][0],y],[Q[0][0],y]);}
+  cx.beginPath();if(k.m!=='out')cx.rect(-w,-h,2*w,2*h); // «снаружи» оставляем только то, что внутри контура
+  Q.forEach((q,i)=>i?cx.lineTo(q[0],q[1]):cx.moveTo(q[0],q[1]));cx.closePath();cx.clip(k.m==='out'?'nonzero':'evenodd');
+}
+let cutA=null; // палец на картинке при вырезе: i — какую точку двигаем (-1 — ставим новую)
+function cutLoc(c,px,py){const b=HB[c.id];if(!b)return null;const dx=px-b.x,dy=py-b.y;let lx=dx*Math.cos(b.r)+dy*Math.sin(b.r);const ly=-dx*Math.sin(b.r)+dy*Math.cos(b.r);if(c.mir)lx=-lx;
+  return[Math.max(-.1,Math.min(1.1,lx/b.w+.5)),Math.max(-.1,Math.min(1.1,ly/b.h+.5))];}
+function cutDown(e){const c=clips.find(k=>k.id===cutM),b=c&&HB[c.id];if(!b)return;cv.setPointerCapture(e.pointerId);const [px,py]=cpos(e);let bi=-1,bd=cv.width*.06;
+  c.cut.p.forEach(([u,v],i)=>{const lx=((c.mir?1-u:u)-.5)*b.w,ly=(v-.5)*b.h,d=Math.hypot(b.x+lx*Math.cos(b.r)-ly*Math.sin(b.r)-px,b.y+lx*Math.sin(b.r)+ly*Math.cos(b.r)-py);if(d<bd){bd=d;bi=i;}});
+  cutA={i:bi,x:px,y:py};}
+cv.addEventListener('pointermove',e=>{if(!cutA)return;const c=clips.find(k=>k.id===cutM);if(!c)return;const [px,py]=cpos(e);cutA.x=px;cutA.y=py;if(cutA.i>=0){const q=cutLoc(c,px,py);if(q)c.cut.p[cutA.i]=q;}});
+cv.addEventListener('pointerup',()=>{if(!cutA)return;const c=clips.find(k=>k.id===cutM);if(c&&cutA.i<0){const q=cutLoc(c,cutA.x,cutA.y);if(q)c.cut.p.push(q);}cutA=null;});
+cv.addEventListener('pointercancel',()=>{cutA=null;});
+function cutStart(){
+  const c=clips.find(k=>k.id===sel),m=c&&media[c.m];if(!c||c.tr>1||!m||m.type==='audio')return toast('Выдели видео или картинку');
+  pause();if(!c.cut)c.cut={p:[],m:'top'};c.cut.p=[];cutM=c.id;
+  const bar=document.createElement('div');bar.id='cutb';bar.style.cssText='position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:45;background:#1a1a1a;border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:6px';
+  const btn=(l,f,k)=>{const b=document.createElement('button');b.className='ch';b.textContent=l;b.onclick=()=>{f();bar.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x.dataset.m===c.cut.m));};if(k)b.dataset.m=k;bar.append(b);};
+  btn('Убрать верх',()=>c.cut.m='top','top');btn('Убрать низ',()=>c.cut.m='bot','bot');btn('Убрать внутри',()=>c.cut.m='in','in');btn('Оставить внутри',()=>c.cut.m='out','out');
+  btn('↶ Точка',()=>c.cut.p.pop());btn('Сбросить',()=>{delete c.cut;cutM=null;bar.remove();save();build();toast('Вырез убран');});
+  btn('Готово',()=>{cutM=null;bar.remove();if(c.cut&&c.cut.p.length<2)delete c.cut;save();build();});
+  bar.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x.dataset.m===c.cut.m));document.body.append(bar);
+  toast('Тыкай точки по картинке. Верх или низ: две точки линией через клип. Внутри: контур от 3 точек');
+}
+// ===== Ключевые кадры, копирование эффектов, эффект кодом =====
+(function(){const st=document.createElement('style');st.textContent='.kfm{position:absolute;top:2px;width:9px;height:9px;margin-left:-5px;background:#ffd400;transform:rotate(45deg);pointer-events:none;z-index:2}';document.head.appendChild(st);})();
+const KP=['x','y','z','sc','rot','op'];
+const kd=(c,p)=>p==='sc'?(c.sc||1):p==='op'?(c.op??1):(c[p]||0);
+function kv(c,p,d){ // значение в момент t: между ключами плавно, до первого и после последнего держится
+  const a=c.kf&&c.kf[p];if(!a||!a.length)return d;const r=t-c.start;if(r<=a[0][0])return a[0][1];const n=a.length-1;if(r>=a[n][0])return a[n][1];
+  let i=0;while(a[i+1][0]<r)i++;const u=(r-a[i][0])/(a[i+1][0]-a[i][0]),e=u*u*(3-2*u);return a[i][1]+(a[i+1][1]-a[i][1])*e;}
+function setKf(c,p,r,v){const a=(c.kf[p]=c.kf[p]||[]),i=a.findIndex(q=>Math.abs(q[0]-r)<.04);if(i>=0)a[i]=[a[i][0],v];else{a.push([r,v]);a.sort((x,y)=>x[0]-y[0]);}}
+function kfSync(c){const r=t-c.start;if(r<0||r>c.dur)return;for(const p in c.kf)if(c.kf[p].length&&typeof c[p]==='number')setKf(c,p,r,c[p]);} // двигаешь клип с ключами, и ключ ставится сам
+function kfBake(c){if(c.kf)for(const p in c.kf)if(c.kf[p].length)c[p]=kv(c,p,kd(c,p));}
+function kfSheet(){
+  const c=clips.find(k=>k.id===sel);if(!c||c.tr===2||c.tr>3)return toast('Выдели картинку, видео или текст');
+  const old=JSON.stringify(c.kf||null),tx=()=>{const r=[...new Set(Object.values(c.kf||{}).flat().map(q=>q[0]))].sort((a,b)=>a-b);$('kt').textContent=r.length?'Ключи, с: '+r.map(x=>x.toFixed(1)).join(', ')+'. Сейчас: '+(t-c.start).toFixed(1):'Ключей нет';};
+  sheet('Ключевые кадры',"<div style='opacity:.7;margin-bottom:8px'>Поставь ключ, перемотай таймлайн, подвинь, поверни или измени клип, и ключ появится сам. Между ключами всё движется плавно.</div><button class='ch' id='ka'>◆ Ключ здесь</button><button class='ch' id='kd'>Убрать ключ здесь</button><button class='ch' id='kn'>След. ключ →</button><button class='ch' id='kx'>Убрать все</button><div id='kt' style='margin-top:8px'></div>",()=>{save();build();},()=>{if(old==='null')delete c.kf;else c.kf=JSON.parse(old);});
+  $('ka').onclick=()=>{const r=t-c.start;if(r<0||r>c.dur)return toast('Поставь курсор внутри клипа');c.kf=c.kf||{};KP.forEach(p=>setKf(c,p,+r.toFixed(2),kv(c,p,kd(c,p))));tx();};
+  $('kd').onclick=()=>{const r=t-c.start;for(const p in c.kf)c.kf[p]=c.kf[p].filter(q=>Math.abs(q[0]-r)>=.05);if(c.kf&&!Object.values(c.kf).some(a=>a.length))delete c.kf;tx();};
+  $('kn').onclick=()=>{const r=t-c.start,n=[...new Set(Object.values(c.kf||{}).flat().map(q=>q[0]))].sort((a,b)=>a-b).find(x=>x>r+.05);if(n!==undefined)t=c.start+n;tx();};
+  $('kx').onclick=()=>{delete c.kf;tx();};tx();
+}
+const FXK=['mk','cut','bm','bri','con','sat','op','ai','ao','ck','vi','vo','kf','mir']; let fxBuf=null;
+function fxCopy(){const c=clips.find(k=>k.id===sel);if(!c)return;fxBuf={};FXK.forEach(k=>{if(c[k]!==undefined)fxBuf[k]=JSON.parse(JSON.stringify(c[k]));});toast('Эффекты скопированы');}
+function fxPaste(all){const c=clips.find(k=>k.id===sel);if(!fxBuf)return toast('Сначала нажми «Копир. эфф.» на нужном клипе');if(!c)return;
+  (all?clips.filter(k=>k.tr===c.tr&&k.tr<4):[c]).forEach(k=>FXK.forEach(f=>{delete k[f];if(fxBuf[f]!==undefined)k[f]=JSON.parse(JSON.stringify(fxBuf[f]));}));save();build();toast(all?'Применено ко всем клипам дорожки':'Эффекты вставлены');}
+const CODE0="// cx — холст, W и H — размер кадра, t — время, p — прогресс эффекта 0…1\n// Пример: красная вспышка, гаснет к концу\ncx.fillStyle='rgba(255,0,0,'+(0.5*(1-p))+')';\ncx.fillRect(0,0,W,H);\n",CF={};
+function runCode(c,W,H,p){let f=CF[c.code];if(f===undefined){try{f=new Function('cx','W','H','t','p','cv',c.code||'');}catch(e){f=null;toast('Ошибка в коде: '+e.message);}CF[c.code]=f;}
+  if(!f)return;cx.save();try{f(cx,W,H,t,p,cv);}catch(e){CF[c.code]=null;toast('Ошибка в коде: '+e.message);}cx.restore();}
+function codeEdit(){
+  const c=clips.find(k=>k.id===sel);if(!c||c.fxn!=='code')return toast('Выдели эффект «Свой код» на дорожке эффектов');
+  sheet('Свой эффект (JavaScript)',"<div style='opacity:.7;margin-bottom:6px'>cx — холст, W и H — размер, t — время, p — прогресс эффекта 0…1, cv — сам холст. Рисуешь поверх кадра.</div><textarea id='cdt' spellcheck='false' style='width:100%;height:220px;font:13px monospace;background:#0d0d0d;color:#eee;border:1px solid #333;border-radius:8px;padding:8px;user-select:text;-webkit-user-select:text'></textarea>",()=>{c.code=$('cdt').value;save();build();});$('cdt').value=c.code||'';
+}
+function maskPath(m,w,h){
+  const s=m.sz||.8,rx=w/2*s,ry=h/2*s;cx.beginPath();
+  if(m.inv)cx.rect(-w,-h,2*w,2*h); // инверсия: вырезаем форму из всего кадра
+  if(m.t==='circle')cx.ellipse(0,0,rx,ry,0,0,7);
+  else if(m.t==='rect')cx.rect(-rx,-ry,2*rx,2*ry);
+  else{cx.moveTo(0,ry);cx.bezierCurveTo(-rx*1.4,ry*.1,-rx,-ry*1.1,0,-ry*.35);cx.bezierCurveTo(rx,-ry*1.1,rx*1.4,ry*.1,0,ry);}
+  cx.clip(m.inv?'evenodd':'nonzero');
+}
+function maskSheet(){
+  const c=clips.find(k=>k.id===sel);if(!c||c.tr>1)return toast('Выдели видео или картинку');
+  const old=JSON.stringify(c.mk||null);if(!c.mk)c.mk={t:'circle',sz:.8,inv:false};
+  sheet('Маска',[['circle','Круг'],['rect','Прямоугольник'],['heart','Сердце']].map(a=>`<button class='ch rt' data-m='${a[0]}'>${a[1]}</button>`).join('')+`<button class='ch' id='mi'>Инверсия</button><button class='ch' id='mo'>Выключить</button><div id='mpr'></div>`,save,()=>{c.mk=JSON.parse(old);});
+  $('shb').querySelectorAll('.rt').forEach(b=>b.onclick=()=>{c.mk.t=b.dataset.m;});
+  $('mi').onclick=()=>{c.mk.inv=!c.mk.inv;};$('mo').onclick=()=>{c.mk=null;$('sh').classList.remove('open');save();};
+  sliders($('mpr'),c.mk,[['sz','Размер',.1,1.5,.01,.8]]);
+}
+
+// ===== Заморозка кадра: стоп-кадр на 1 секунду в месте курсора =====
+function freeze(){
+  const c=clips.find(k=>k.id===sel),m=c&&media[c.m];
+  if(!m||m.type!=='video'||t<=c.start+.05||t>=c.start+c.dur-.05)return toast('Выдели видеоклип и поставь курсор внутрь него');
+  const src=c.in+(t-c.start)*(c.sp||1),tail={...c,id:'c'+nid++,start:t+1,in:src,dur:c.start+c.dur-t};
+  const fr={id:'c'+nid++,m:c.m,tr:c.tr,start:t,in:src,dur:1,fz:true,sp:1,vol:0};
+  clips.forEach(k=>{if(k.tr===c.tr&&k!==c&&k.start>=t)k.start+=1;}); // сдвигаем всё после, чтобы не наложилось
+  c.dur=t-c.start;clips.push(fr,tail);sel=fr.id;save();build();
+}
+
+// ===== Анимации клипа (вход и выход) и субтитры =====
+const AN=[['','Нет'],['zoom','Приближение'],['pop','Из точки'],['slide','Выезд сбоку'],['spin','Вращение']];
+function animSheet(){
+  const c=clips.find(k=>k.id===sel);if(!c||c.tr>1)return toast('Выдели видео или картинку');
+  const old=[c.ai,c.ao];let mode='ai';
+  sheet('Анимации клипа',`<button class='ch' data-w='ai'>Вход</button><button class='ch' data-w='ao'>Выход</button><div id='al'></div>`,save,()=>{c.ai=old[0];c.ao=old[1];});
+  const show=()=>{
+    $('shb').querySelectorAll('[data-w]').forEach(b=>b.classList.toggle('on',b.dataset.w===mode));
+    $('al').innerHTML=AN.map(a=>`<button class='ch${(c[mode]||'')===a[0]?' on':''}' data-a='${a[0]}'>${a[1]}</button>`).join('');
+    $('al').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{c[mode]=b.dataset.a||undefined;show();});
+  };
+  $('shb').querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{mode=b.dataset.w;show();});show();
+}
+function subAdd(){const id='c'+nid++;clips.push({id,tr:3,start:t,in:0,dur:2,text:'Субтитр',y:.38,size:.045});save();sel=id;build();editText();}
+
+// ===== Отдельный режим «3D-редактор» (как в 3D-приложениях: вид сцены на весь экран) =====
+let m3=false,RV=null,EC=null,pl3=null,rvw=0,rvh=0;const ev={a:35,e:20,d:9};let inCam=false,camBtn=null;
+function iconTex(kind){ // значки лампы и камеры в сцене
+  const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.strokeStyle='#fff';g.lineWidth=4;g.lineCap='round';g.beginPath();
+  if(kind==='bulb'){g.arc(32,26,14,0,7);g.moveTo(26,46);g.lineTo(38,46);g.moveTo(27,52);g.lineTo(37,52);for(let i=0;i<5;i++){const a=-Math.PI+i*Math.PI/4;g.moveTo(32+20*Math.cos(a),26+20*Math.sin(a));g.lineTo(32+27*Math.cos(a),26+27*Math.sin(a));}}
+  else{g.rect(8,20,34,24);g.moveTo(42,28);g.lineTo(58,20);g.lineTo(58,44);g.lineTo(42,36);}
+  g.stroke();return new THREE.CanvasTexture(c);
+}
+function mkHelp(K){ // сетка пола, оси, лампа, камера, рамка выбранного объекта — только для редактора, в готовое видео не попадают
+  const H=new THREE.Group(),ln=(a,b,c)=>new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]),new THREE.LineBasicMaterial({color:c}));
+  const sp=k=>{const x=new THREE.Sprite(new THREE.SpriteMaterial({map:iconTex(k),depthTest:false,transparent:true}));x.scale.set(.7,.7,.7);x.renderOrder=10;return x;};
+  K.help={g:H,bulb:sp('bulb'),cam:sp('cam'),line:ln([0,0,0],[0,0,-1],0x4fd1e5),bh:new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(1,1,1)),0xffd54f)};
+  H.add(new THREE.GridHelper(40,40,0x555555,0x3a3a3a),ln([-20,0,0],[20,0,0],0xc0392b),ln([0,0,0],[0,20,0],0x6fcf4f),ln([0,0,-20],[0,0,20],0x3b6fe0),K.help.bulb,K.help.cam,K.help.line,K.help.bh);
+  H.visible=false;K.scene.add(H);
+}
+const rc=()=>window.THREE&&(rc.r=rc.r||new THREE.Raycaster());
+function pick3(e){ // тап по объекту в сцене выбирает его
+  const K=cache[cur3.id],r=RV.domElement.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  rc().setFromCamera(v,EC);const h=rc().intersectObjects(Object.values(K.m),false)[0];
+  s3=h?Object.keys(K.m).find(k=>K.m[k]===h.object):null;
+}
+let gzMode='move';
+function tgt3(K){ // что сейчас выбрано: 3D-объект или 2D-клип
+  const o=s3&&cur3.sc3.objs.find(q=>q.id===s3);if(o&&K.m[s3])return{k:'o',o,m:K.m[s3]};
+  const c=clips.find(q=>q.id===sel),m=c&&K.mir&&K.mir[c.id];return m&&m.visible?{k:'c',o:c,m}:null;
+}
+function gzBuild(K,mode,two){ // цветные стрелки, кольца и кубики как в Blender: X красный, Y зелёный, Z синий
+  const G=K.gz;G.clear();K.gzM=mode+two;const C=[0xff3b3b,0x3bff3b,0x3b7bff];
+  [0,1,2].forEach(ax=>{
+    if(two&&(mode==='rot'?ax!==2:mode==='scale'&&ax===2))return; // у 2D-клипа: двигать и менять размер по X/Y, вращать вокруг Z
+    const mt=new THREE.MeshBasicMaterial({color:C[ax],depthTest:false,transparent:true}),add=(g,p,r)=>{const m=new THREE.Mesh(g,mt);m.position.copy(p);m.rotation.set(r[0],r[1],r[2]);m.renderOrder=999;m.userData.ax=ax;G.add(m);};
+    const d=new THREE.Vector3(ax===0,ax===1,ax===2).multiplyScalar(1),ro=[[0,0,-Math.PI/2],[0,0,0],[Math.PI/2,0,0]][ax];
+    if(mode==='rot')add(new THREE.TorusGeometry(1,.06,8,48),new THREE.Vector3(),[[0,Math.PI/2,0],[Math.PI/2,0,0],[0,0,0]][ax]);
+    else{add(new THREE.CylinderGeometry(.07,.07,1,8),d.clone().multiplyScalar(.5),ro);
+      add(mode==='move'?new THREE.CylinderGeometry(0,.2,.45,12):new THREE.BoxGeometry(.3,.3,.3),d.clone().multiplyScalar(1.15),ro);}
+  });
+}
+function gzUpd(K){
+  if(!K.gz){K.gz=new THREE.Group();K.gz.visible=false;K.scene.add(K.gz);K.gzM='';}
+  const T=inCam?null:tgt3(K);if(!T)return;
+  if(K.gzM!==gzMode+(T.k==='c'))gzBuild(K,gzMode,T.k==='c');
+  T.m.getWorldPosition(K.gz.position);K.gz.scale.setScalar(EC.position.distanceTo(K.gz.position)*.14);K.gz.visible=true;
+}
+const A3v=i=>new THREE.Vector3(i===0?1:0,i===1?1:0,i===2?1:0); // THREE грузится позже, поэтому не константа
+function axT(ray,P,d){const w=ray.origin.clone().sub(P),b=ray.direction.dot(d),d0=ray.direction.dot(w),e0=d.dot(w),den=1-b*b;return den<1e-4?0:(e0-b*d0)/den;} // где на оси ближе всего луч пальца
+function scrAng(e,P){const r=RV.domElement.getBoundingClientRect(),v=P.clone().project(EC);return Math.atan2(e.clientY-(r.top+(1-v.y)/2*r.height),e.clientX-(r.left+(v.x+1)/2*r.width));}
+function gz3(e,g){ // палец на стрелке: тянем выбранное
+  const K=cache[cur3.id],T=K&&K.gz&&tgt3(K);if(!T)return false;const R=ray3(e),h=R.intersectObjects(K.gz.children,false)[0];if(!h)return false;
+  const ax=h.object.userData.ax,P=K.gz.position.clone(),o=T.o;if(T.k==='c')kfBake(o);
+  g.gz={T,ax,P,mode:gzMode,t0:axT(R.ray,P,A3v(ax)),a0:scrAng(e,P),s:T.k==='o'?{x:o.x,y:o.y,z:o.z,rx:o.rx,ry:o.ry,rz:o.rz,s:o.s}:{x:o.x||0,y:o.y||0,z:o.z||0,r:o.rot||0,s:o.sc||1}};return true;
+}
+function applyGz(z,e){
+  const R=ray3(e),d=axT(R.ray,z.P,A3v(z.ax))-z.t0,o=z.T.o,s=z.s,u=4/cv.height,c3=z.T.k==='o';
+  if(z.mode==='move'){if(c3){const k='xyz'[z.ax];o[k]=s[k]+d;}else if(z.ax===0)o.x=s.x+d/(cv.width*u);else if(z.ax===1)o.y=s.y-d/(cv.height*u);else o.z=Math.max(-20,Math.min(7,s.z+d));}
+  else if(z.mode==='scale'){const f=Math.max(.05,1+d*.6);if(c3)o.s=s.s*f;else o.sc=s.s*f;}
+  else{const a=(scrAng(e,z.P)-z.a0)*180/Math.PI,sg=Math.sign(A3v(z.ax).dot(EC.position.clone().sub(z.P)))||1;if(c3){const k=['rx','ry','rz'][z.ax];o[k]=s[k]-a*sg;}else o.rot=s.r+a*sg;}
+  if(!c3&&o.kf)kfSync(o);
+}
+function ray3(e){const r=RV.domElement.getBoundingClientRect();rc().setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),EC);return rc();}
+function drag3(e,g){ // палец на 2D-клипе в 3D-виде: тащим клип, и он двигается и в 2D
+  const K=cache[cur3.id];if(!K||!K.mir)return;const R=ray3(e),o=R.intersectObjects(Object.values(K.m),false)[0],h=R.intersectObjects(Object.values(K.mir).filter(m=>m.visible),false)[0];
+  if(!h||(o&&o.distance<h.distance))return;
+  const id=Object.keys(K.mir).find(k=>K.mir[k]===h.object),c=clips.find(k=>k.id===id),p=new THREE.Vector3();
+  const Zc=(HB[id]&&HB[id].z)||0;if(!c||!R.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),-Zc),p))return;
+  kfBake(c);sel=id;g.dr={c,p,x:c.x||0,y:c.y||0,z:Zc};
+}
+function initRV(){
+  try{RV=new THREE.WebGLRenderer({antialias:true});}catch(e){RV=false;toast('WebGL недоступен в этом браузере');return;}
+  RV.setPixelRatio(Math.min(devicePixelRatio||1,2));RV.setClearColor(0x2b2b2b,1);EC=new THREE.PerspectiveCamera(50,1,.1,500);
+  const el=RV.domElement,ps=new Map();let g=null;const dist=()=>{const [a,b]=[...ps.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])||1;};
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);ps.set(e.pointerId,[e.clientX,e.clientY]);const cm=cur3.sc3.cam;g={x:e.clientX,y:e.clientY,a:ev.a,e:ev.e,d:ev.d,ca:cm.a,ce:cm.e,cd:cm.d,p:ps.size>1?dist():0,moved:false};if(ps.size===1&&!inCam&&!gz3(e,g))drag3(e,g);});
+  el.addEventListener('pointermove',e=>{ // один палец вращает вид, два пальца приближают
+    if(!ps.has(e.pointerId)||!g)return;ps.set(e.pointerId,[e.clientX,e.clientY]);
+    if(ps.size>1){if(!g.p){g.p=dist();g.d=ev.d;}if(inCam)cur3.sc3.cam.d=Math.max(1,Math.min(60,g.cd*g.p/dist()));else ev.d=Math.max(1.5,Math.min(60,g.d*g.p/dist()));g.moved=true;}
+    else{const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.abs(dx)+Math.abs(dy)>4)g.moved=true;if(g.moved&&!g.p){if(g.gz)applyGz(g.gz,e);else if(g.dr){const p=new THREE.Vector3();if(ray3(e).ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),-g.dr.z),p)){const u=4/cv.height;g.dr.c.x=g.dr.x+(p.x-g.dr.p.x)/(cv.width*u);g.dr.c.y=g.dr.y-(p.y-g.dr.p.y)/(cv.height*u);if(g.dr.c.kf)kfSync(g.dr.c);}}else if(inCam){const cm=cur3.sc3.cam;cm.a=g.ca-dx*.4;cm.e=Math.max(-85,Math.min(85,g.ce+dy*.4));}else{ev.a=g.a-dx*.4;ev.e=Math.max(-85,Math.min(85,g.e+dy*.4));}}}
+  });
+  el.addEventListener('pointerup',e=>{ps.delete(e.pointerId);if(g&&!g.moved&&!ps.size&&!g.gz)pick3(e);if(g&&g.moved&&!ps.size)save();if(!ps.size)g=null;});
+  el.addEventListener('pointercancel',()=>{ps.clear();g=null;});
+  el.addEventListener('wheel',e=>{e.preventDefault();ev.d=Math.max(1.5,Math.min(60,ev.d*(e.deltaY>0?1.1:.91)));},{passive:false});
+}
+function mir3(K,c3){ // 2D-клипы как плоскости в 3D-виде: то же положение, размер, поворот и прозрачность, что в 2D
+  if(!K.mg){K.mg=new THREE.Group();K.mg.visible=false;K.scene.add(K.mg);K.mir={};
+    const fr=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.PlaneGeometry(4*cv.width/cv.height,4)),new THREE.LineBasicMaterial({color:0x4fd1e5}));fr.position.y=1;K.mg.add(fr);} // рамка кадра
+  const W=cv.width,H=cv.height,u=4/H;let z=0;
+  for(const c of clips){
+    const m=media[c.m],b=HB[c.id],M=K.mir[c.id],act=m&&m.type!=='audio'&&b&&c.tr<2&&t>=c.start&&t<c.start+c.dur&&!c3.sc3.objs.some(o=>o.src===c.id);
+    if(!act){if(M)M.visible=false;continue;}
+    const e=el(c);let P=M;
+    if(!P){const tx=m.type==='video'?new THREE.VideoTexture(e):new THREE.Texture(e);tx.needsUpdate=true;
+      P=K.mir[c.id]=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:tx,transparent:true,side:THREE.DoubleSide,depthWrite:false}));K.mg.add(P);}
+    P.visible=true;const F=b.F||1;P.position.set((b.x-W/2)/F*u,1-(b.y-H/2)/F*u,(b.z||0)+.02*(z++)+(c.tr?.01:0));P.rotation.z=-b.r;P.scale.set(b.w/F*u*(c.mir?-1:1),b.h/F*u,1);
+    P.material.opacity=c.op??1;const ct=e.currentTime||0;if(P.userData.ct!==ct){P.userData.ct=ct;P.material.map.needsUpdate=true;}
+  }
+}
+function rv3(){ // рисуем сцену с камерой редактора + вспомогательные значки
+  if(!window.THREE||!RV)return;
+  cur3=clips.find(k=>k.id===cur3.id)||cur3;const c=cur3,K=cache[c.id];if(!K)return;
+  if(!K.help)mkHelp(K);
+  const hp=K.help,box=$('e3v'),w=box.clientWidth,h=box.clientHeight;
+  if(w&&h&&(w!==rvw||h!==rvh)){rvw=w;rvh=h;RV.setSize(w,h,false);EC.aspect=w/h;EC.updateProjectionMatrix();}
+  const a=ev.a*D,e=ev.e*D;EC.position.set(Math.sin(a)*Math.cos(e)*ev.d,1+Math.sin(e)*ev.d,Math.cos(a)*Math.cos(e)*ev.d);EC.lookAt(0,1,0);EC.fov=inCam?K.cam.fov:50;if(inCam){EC.position.copy(K.cam.position);EC.quaternion.copy(K.cam.quaternion);}EC.updateProjectionMatrix();hp.cam.visible=!inCam;
+  hp.bulb.position.copy(K.dir.position);hp.cam.position.copy(K.cam.position);
+  hp.line.geometry.setFromPoints([K.cam.position,K.cam.position.clone().add(new THREE.Vector3(0,0,-1.8).applyQuaternion(K.cam.quaternion))]);
+  const m=s3&&K.m[s3];hp.bh.visible=!!m;if(m)hp.bh.setFromObject(m);
+  mir3(K,c);gzUpd(K);K.mg.visible=true;hp.g.visible=true;RV.render(K.scene,EC);hp.g.visible=false;K.mg.visible=false;K.gz.visible=false;
+  $('e3m').textContent=fmt(t-c.start)+' / '+fmt(c.dur);
+  if(document.activeElement!==$('e3s'))$('e3s').value=Math.max(0,Math.min(1,(t-c.start)/c.dur));
+  if(pl3!==playing){pl3=playing;$('e3pl').innerHTML=ic(playing?'pause':'play',28);}
+}
+function enter3(c){
+  cur3=c;m3=true;on3=true;inCam=false;camBtn&&camBtn.upd();pause();
+  t=Math.max(c.start,Math.min(t,c.start+c.dur-.01));
+  if(!cache[c.id])r3(c,cv.width,cv.height); // создаём сцену
+  if(!RV&&RV!==false)initRV();
+  if(!RV)return exit3();
+  $('e3v').append(RV.domElement);document.body.classList.add('m3');
+}
+function exit3(){m3=false;on3=false;document.body.classList.remove('m3');$('sh').classList.remove('open');closeMd();pause();build();}
+function newObj(S,kind,src,x){ // новый объект стоит на полу (y=1 при масштабе 1)
+  const o=Object.assign({id:'o'+nid++,kind,src,col:kind==='layer'||kind==='text'?'#ffffff':'#4fd1e5',x:0,y:1,z:0,rx:0,ry:0,rz:0,s:1,vx:0,vy:0,vz:0,rv:0},x||{});
+  S.objs.push(o);s3=o.id;save();return o;
+}
+// Окно со списком объектов: «Выбрать», «Камера» (привязать), «Удалить»; в режиме attach — «Окно» или «Следить»
+function objWin(S,mode){
+  md(`<b>${mode==='attach'?'Привязать камеру к…':'Объекты сцены'}</b><div id='ol'></div><button id='oc'>Закрыть</button>`);
+  const NMS={cube:'Куб',sphere:'Шар',plane:'Плоскость',cyl:'Цилиндр',layer:'Слой',text:'Текст'};
+  if(!S.objs.length)$('ol').textContent='В сцене пока нет объектов: добавь их через «Модели», «Медиа» или «Текст».';
+  S.objs.forEach((o,i)=>{
+    const src=o.src&&clips.find(k=>k.id===o.src),m=src&&media[src.m],r=document.createElement('div'),th=m&&(m.thumb||(m.type==='image'&&m.url));
+    r.className='row';r.style.cssText='margin:6px 0';
+    r.innerHTML=(th?`<img src='${th}' style='width:44px;height:44px;object-fit:cover;border-radius:6px'>`:'')+`<span style='flex:2'></span>`;
+    r.querySelector('span').textContent=(m?m.name:(o.txt||NMS[o.kind]+' '+(i+1)))+(S.cam.att===o.id?' (камера здесь)':'');
+    const bt=(l,f)=>{const b=document.createElement('button');b.className='ch'+(s3===o.id?' on':'');b.textContent=l;b.onclick=f;r.append(b);};
+    const att=w=>{S.cam.att=o.id;S.cam.win=w;s3=o.id;save();closeMd();toast(w?'Камера в центре «окна»':'Камера привязана');};
+    if(mode==='attach'){bt('Окно',()=>att(true));bt('Следить',()=>att(false));}
+    else{bt('Выбрать',()=>{s3=o.id;closeMd();});bt('Камера',()=>att(true));
+      bt('Удалить',()=>{S.objs=S.objs.filter(q=>q!==o);if(S.cam.att===o.id)S.cam.att=null;if(s3===o.id)s3=null;save();objWin(S,mode);});}
+    $('ol').append(r);
+  });
+  $('oc').onclick=closeMd;
+}
+function mediaWin(){ // видео и картинки проекта — в сцену плоскостью
+  const S=cur3.sc3,L=clips.filter(k=>k.m&&media[k.m]&&media[k.m].type!=='audio');
+  md(`<b>Что поставить в сцену</b><div id='ml2'></div><button id='mc2'>Закрыть</button>`);
+  if(!L.length)$('ml2').textContent='В проекте нет видео и картинок: добавь их на таймлайн.';
+  L.forEach(k=>{const m=media[k.m],th=m.thumb||(m.type==='image'&&m.url),b=document.createElement('button');
+    b.className='ch';b.style.cssText='display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start;margin:4px 0';
+    b.innerHTML=(th?`<img src='${th}' style='width:48px;height:48px;object-fit:cover;border-radius:6px'>`:'')+'<span></span>';b.lastChild.textContent=m.name;
+    b.onclick=()=>{newObj(S,'layer',k.id);closeMd();toast('Добавлено в сцену: '+m.name);};$('ml2').append(b);});
+  $('mc2').onclick=closeMd;
+}
+function textWin(){
+  md(`<b>Текст в сцене</b><input id='t3' placeholder='Текст'><button class='pri' id='t3k'>Добавить</button>`);
+  $('t3k').onclick=()=>{const v=$('t3').value.trim();if(!v)return toast('Впиши текст');newObj(cur3.sc3,'text',null,{txt:v,y:2.5});closeMd();};
+}
+function skyWin(){
+  const S=cur3.sc3;md(`<b>Небо (фон сцены)</b><input type='color' id='sk'><button class='ch' id='sn1'>Прозрачный фон</button><button class='pri' id='sk2'>Готово</button>`);
+  $('sk').value=S.sky||'#87ceeb';$('sk').oninput=()=>{S.sky=$('sk').value;};$('sn1').onclick=()=>{S.sky=null;closeMd();save();};$('sk2').onclick=()=>{closeMd();save();};
+}
+$('e3h').onclick=exit3;$('e3u').onclick=undo;$('e3r').onclick=redo;$('e3pl').onclick=toggle;
+$('e3z').onclick=()=>{Object.assign(ev,{a:35,e:20,d:9});};
+$('e3l').onclick=()=>objWin(cur3.sc3,'list');
+$('e3s').oninput=e=>{t=cur3.start+ +e.target.value*cur3.dur;};
+[['cube','Модели',()=>{tab3='o';sheet3();}],['sky','Небо',skyWin],['cam','Камера',()=>{tab3='c';sheet3();}],['bulb','Свет',()=>{tab3='l';sheet3();}],['img','Медиа',mediaWin],['text','Текст',textWin]]
+  .forEach(([i,l,f])=>{const b=document.createElement('button');b.innerHTML='<b>'+ic(i)+'</b>'+l;b.onclick=f;$('e3b').append(b);});
+camBtn=document.createElement('button');const cbl=camBtn.upd=()=>{camBtn.innerHTML='<b>'+ic('cam')+'</b>'+(inCam?'Из камеры':'В камеру');camBtn.style.color=inCam?'#4fd1e5':'#fff';};cbl();
+camBtn.onclick=()=>{inCam=!inCam;cbl();toast(inCam?'Ты в камере: палец двигает её, два пальца — ближе и дальше':'Обычный вид');};$('e3b').append(camBtn);
+const gb=document.createElement('button'),GN={move:'Двигать',rot:'Вращать',scale:'Размер'},gl=()=>{gb.innerHTML='<b>'+ic('cube')+'</b>'+GN[gzMode];};gl();
+gb.onclick=()=>{gzMode=gzMode==='move'?'rot':gzMode==='rot'?'scale':'move';gl();};$('e3b').append(gb);
+
+
+// ===== Главное меню: проекты =====
+(function(){const st=document.createElement('style');st.textContent="#home{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));overflow:auto}#home.open{display:flex}#home h1{margin:8px 0 16px;font-size:26px}#hn{background:var(--ac);color:#000;font-weight:700;font-size:16px;min-height:64px;margin-bottom:20px}#home .pc{display:flex;gap:12px;align-items:center;padding:10px;margin-bottom:10px;text-align:left;min-height:84px;width:100%}#home .pc img,#home .ph0{width:64px;height:64px;border-radius:10px;object-fit:cover;background:#2c3e50;flex:none}";document.head.appendChild(st);})();
+function homeShow(){
+  pause();let h=$('home');if(!h){h=document.createElement('div');h.id='home';document.body.appendChild(h);}
+  const n=clips.length,d=total(),m0=clips.map(c=>media[c.m]).find(m=>m&&m.thumb);
+  h.innerHTML="<h1>Проекты</h1><button id='hn'>＋ Новый проект</button>"+(n?"<button class='pc' id='hc'>"+(m0?"<img src='"+m0.thumb+"'>":"<div class='ph0'></div>")+"<div><b>Мой проект</b><br><span style='opacity:.6'>"+n+" клипов · "+d.toFixed(1)+" с</span></div></button>":"<div style='opacity:.5'>Пока пусто</div>");
+  h.classList.add('open');
+  $('hn').onclick=()=>{if(n)newProj();h.classList.remove('open');};
+  if(n)$('hc').onclick=()=>h.classList.remove('open');
+}
+
+// ===== Запуск =====
+document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=ic(e.dataset.i,+e.dataset.s||24)); // иконки в разметке
+rsLabel();libInit();pLoad().then(homeShow);save();fitCanvas();build();requestAnimationFrame(loop);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{}); // офлайн-режим
+</script></body></html>
