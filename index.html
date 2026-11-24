@@ -22,7 +22,7 @@ button:active{filter:brightness(1.5)}
 #lbl div{height:40px;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--p);border-bottom:1px solid var(--bg)}
 #area{position:absolute;left:44px;right:0;top:0;bottom:0;overflow:hidden;touch-action:none;background:repeating-linear-gradient(#141414 0 40px,#1b1b1b 40px 80px) 0 22px}
 #rl{position:absolute;left:0;top:0;height:22px}
-#lane{position:absolute;left:0;top:22px;width:1px}
+#lw{position:absolute;left:0;right:0;top:22px;bottom:0;overflow:hidden}#lane{position:absolute;left:0;top:0;width:1px}
 #ph{position:absolute;left:calc(44px + (100% - 44px)/2 - 1px);top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:3}
 #ph.sn{background:var(--ac);box-shadow:0 0 8px var(--ac)}
 .clip{position:absolute;height:34px;border-radius:8px;background:#2c3e50 left center/auto 100% repeat-x;font-size:11px;white-space:nowrap;overflow:hidden}
@@ -44,7 +44,7 @@ button:active{filter:brightness(1.5)}
 #shh{font-weight:600;margin-bottom:6px}
 #shf{display:flex;justify-content:space-between;margin-top:8px}
 .rt{margin:4px;padding:0 20px}.rt.on{background:var(--ac);color:#000}
-#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:90%;background:#333;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .2s;z-index:10;pointer-events:none;text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:90%;background:#333;padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .2s;z-index:70;pointer-events:none;text-align:center}
 /* ===== Оформление как в CapCut ===== */
 i{display:flex;font-style:normal}
 svg{display:block;flex:none}
@@ -96,7 +96,7 @@ svg{display:block;flex:none}
 .tile span{position:absolute;padding:2px 5px;background:#000a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tile .n{left:0;right:0;bottom:0}.tile .d{top:0;left:0;border-radius:0 0 6px 0}
 #ls{flex:none;font-size:12px;color:#8a8a8a;padding:6px 0}
-#md{position:fixed;inset:0;background:#000c;display:none;z-index:20;align-items:center;justify-content:center;padding:12px}
+#md{position:fixed;inset:0;background:#000c;display:none;z-index:60;align-items:center;justify-content:center;padding:12px}
 #mc{width:100%;max-width:420px;max-height:90vh;overflow:auto;background:#1a1a1a;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
 #mc video,#mc img{width:100%;max-height:30vh;object-fit:contain;background:#000;border-radius:8px}
 #mc audio{width:100%}
@@ -121,19 +121,19 @@ input[type=range]{accent-color:#4fd1e5}
 #e3b{flex:none;height:72px;display:flex;gap:4px;overflow-x:auto;padding:4px;background:#0d0d0d;scrollbar-width:none}
 #e3b button{flex:none;width:72px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:#fff;background:none}
 #e3b button b{display:flex;font-weight:400}
-.m3 #sh{z-index:31}.m3 #md{z-index:40}.m3 #toast{z-index:50}
+.m3 #sh{z-index:31}#e3q{position:absolute;top:52px;left:6px;width:230px;max-height:55%;overflow:auto;background:#1a1a1af0;border-radius:12px;padding:6px;display:none;z-index:3}#e3q.open{display:block}#e3q .r{display:flex;align-items:center;gap:2px;margin:2px 0}#e3q .r button{min-height:38px}#e3q .n{flex:1;text-align:left;padding:0 10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}#e3q .n.on{background:var(--ac);color:#000}.m3 #md{z-index:40}.m3 #toast{z-index:50}
 </style></head><body>
 <div id="app">
  <div id="top"><div><button class='ib' id='cls'><i data-i='close'></i></button><button class='ib' id='sr'><i data-i='search'></i></button></div><div><button id='rs'></button><button id='exp'>Экспорт</button></div></div>
  <div id="pv"><canvas id="cv"></canvas></div>
  <div id='ctl'><div><button class='ib' id='fs'><i data-i='full'></i></button><span id='tm'><b>00:00</b> / 00:00</span></div><button id='play'><i data-i='play' data-s='28'></i></button><div><button class='ib' id='sn'><i data-i='magnet'></i><span>ON</span></button><button class='ib' id='un'><i data-i='undo'></i></button><button class='ib' id='re'><i data-i='redo'></i></button></div></div>
- <div id="tl"><div id='lbl'><button class='ib' id='mu'><i data-i='vol'></i><span>Выкл. звук</span></button><div id='cov'><i data-i='pen' data-s='16'></i><span>Обложка</span></div></div><div id="area"><canvas id="rl"></canvas><div id="lane"></div></div><div id="ph"></div></div>
+ <div id="tl"><div id='lbl'><button class='ib' id='mu'><i data-i='vol'></i><span>Выкл. звук</span></button><div id='cov'><i data-i='pen' data-s='16'></i><span>Обложка</span></div></div><div id="area"><canvas id="rl"></canvas><div id="lw"><div id="lane"></div></div></div><div id="ph"></div></div>
  <div id="tb"></div>
 </div>
 <div id="sh"><div id="grip"></div><div id="shh"></div><div id="shb"></div><div id='shf'><button class='ib' id='no'><i data-i='close'></i></button><button class='ib' id='ok'><i data-i='check'></i></button></div></div>
 <div id='lib'><div id='lh'><input id='lq' placeholder='Поиск: название, фраза, теги'><button class='ib' id='la'><i data-i='plus'></i></button><button class='ib' id='lx'><i data-i='close'></i></button></div><div id='lch'></div><div id='lg'></div><div id='ls'></div></div>
 <div id='md'><div id='mc'></div></div>
-<div id='e3'><div id='e3v'><div id='e3t'><button class='ib' id='e3h'><i data-i='home'></i></button><button class='ib' id='e3u'><i data-i='undo'></i></button><button class='ib' id='e3r'><i data-i='redo'></i></button><span style='flex:1'></span><button class='ib' id='e3z'><i data-i='refresh'></i></button><button class='ib' id='e3l'><i data-i='list'></i></button></div></div><div id='e3p'><button class='ib' id='e3pl'><i data-i='play' data-s='28'></i></button><span id='e3m'>00:00 / 00:00</span><input type='range' id='e3s' min='0' max='1' step='.001'></div><div id='e3b'></div></div>
+<div id='e3'><div id='e3v'><div id='e3t'><button class='ib' id='e3h'><i data-i='home'></i></button><button class='ib' id='e3o'><i data-i='chev'></i></button><button class='ib' id='e3u'><i data-i='undo'></i></button><button class='ib' id='e3r'><i data-i='redo'></i></button><span style='flex:1'></span><button class='ib' id='e3z'><i data-i='refresh'></i></button><button class='ib' id='e3l'><i data-i='list'></i></button></div><div id='e3q'></div></div><div id='e3p'><button class='ib' id='e3pl'><i data-i='play' data-s='28'></i></button><span id='e3m'>00:00 / 00:00</span><input type='range' id='e3s' min='0' max='1' step='.001'></div><div id='e3b'></div></div>
 <input type='file' id='lf' multiple accept='video/*,image/*' hidden>
 <div id="toast"></div>
 <input type="file" id="file" multiple accept="video/*,image/*" hidden>
@@ -144,7 +144,7 @@ const cv=$('cv'),cx=cv.getContext('2d'),A=$('area');
 // media — загруженные файлы; els — по одному video/audio на клип; clips — клипы на дорожках
 let media={},els={},clips=[],sel=null,t=0,pps=60,playing=false,ratio=[9,16],res=720,nid=1,addTrack=0,g=null;
 // Дорожки: 0 основная, 1 наложение, 2 аудио, 3 текст, 4 эффекты
-let Y={},muted=false,snapOn=true; // Y — высота строк таймлайна
+let Y={},muted=false,snapOn=true,vy=0,CH=0; // vy — прокрутка таймлайна вниз, CH — высота всех строк // Y — высота строк таймлайна
 // Иконки: только линейные SVG, белые, stroke 1.8, 24x24
 const IC={
 close:`<path d='M6 6l12 12M18 6L6 18'/>`,search:`<circle cx='11' cy='11' r='6.5'/><path d='M16 16l4.5 4.5'/>`,chev:`<path d='M6 9l6 6 6-6'/>`,
@@ -172,6 +172,7 @@ home:`<path d='M4 11l8-7 8 7M6 10v10h12V10'/>`,list:`<path d='M8 6h12M8 12h12M8 
 refresh:`<path d='M20 11a8 8 0 0 0-14-4M4 4v4h4M4 13a8 8 0 0 0 14 4M20 20v-4h-4'/>`,sky:`<path d='M6 18a4 4 0 0 1 1-8 6 6 0 0 1 11 2 3 3 0 0 1 0 6z'/>`,
 img:`<rect x='3' y='5' width='18' height='14' rx='2'/><circle cx='9' cy='10' r='1.5'/><path d='M21 16l-5-5-9 8'/>`,bulb:`<path d='M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z'/>`,
 star:`<path d='M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'/>`,folder:`<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>`};
+IC.up=`<path d='M12 19V5M6 11l6-6 6 6'/>`;IC.down=`<path d='M12 5v14M6 13l6 6 6-6'/>`;
 const ic=(n,s=24,c='#fff')=>`<svg width='${s}' height='${s}' viewBox='0 0 24 24' fill='none' stroke='${c}' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'>${IC[n]}</svg>`;
 const fmt=s=>{s=Math.max(0,s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0')};
 const total=()=>clips.reduce((m,c)=>Math.max(m,c.start+c.dur),0);
@@ -270,7 +271,7 @@ function draw(){
     if(c.ao&&c.start+c.dur-t<.4){ph=1-(c.start+c.dur-t)/.4;at=c.ao;}
     const as=at==='zoom'?1+ph*.6:at==='pop'?Math.max(.01,1-ph):1; // параметры клипа: масштаб, сдвиг, поворот, отражение, прозрачность
     cx.save();cx.globalAlpha=kv(c,'op',c.op??1)*Math.min(1,c.vi?(t-c.start)/c.vi:1,c.vo?(c.start+c.dur-t)/c.vo:1);cx.globalCompositeOperation=c.bm||'source-over';
-    const lf=(flt+(c.bri!=null?' brightness('+c.bri+')':'')+(c.con!=null?' contrast('+c.con+')':'')+(c.sat!=null?' saturate('+c.sat+')':'')).trim();if(lf)cx.filter=lf; // фильтры клипа
+    const lf=(flt+(c.bri!=null?' brightness('+c.bri+')':'')+(c.con!=null?' contrast('+c.con+')':'')+(c.sat!=null?' saturate('+c.sat+')':'')+(c.hue?' hue-rotate('+c.hue+'deg)':'')+(c.sep?' sepia('+c.sep+')':'')+(c.gry?' grayscale('+c.gry+')':'')+(c.blr?' blur('+c.blr+'px)':'')+(c.glw?(' drop-shadow(0 0 '+(c.glw*W*.03).toFixed(1)+'px '+(c.glc||'#ffffff')+')').repeat(2):'')).trim();if(lf)cx.filter=lf; // фильтры клипа
     cx.translate(W/2+kv(c,'x',c.x||0)*W*F+(at==='slide'?-ph*W*.5:0),H/2+kv(c,'y',c.y||0)*H*F);cx.rotate(kv(c,'rot',c.rot||0)*Math.PI/180+(at==='spin'?ph*Math.PI*2:0));cx.scale(as,as);if(c.mir)cx.scale(-1,1);cx.scale(cY,cX);
     if(c.mk)maskPath(c.mk,sw*k,sh*k);if(c.cut)cutPath(c.cut,sw*k,sh*k);
     cx.drawImage(c.ck&&!pip?keyed(c,e,sw,sh):e,-sw*k/2,-sh*k/2,sw*k,sh*k);cx.restore();
@@ -314,7 +315,7 @@ let wake=0;const kick=()=>{wake=performance.now()+500;};
 function ui(){ // двигается лента под курсором
   const tmS='<b>'+fmt(t)+'</b> / '+fmt(total());if(ui.s!==tmS){ui.s=tmS;$('tm').innerHTML=tmS;}
   const w=A.clientWidth,r=$('rl'),p=w*.45; // курсор левее центра, на 45% ширины
-  $('lane').style.transform='translateX('+(p-t*pps)+'px)';
+  vy=Math.max(0,Math.min(vy,Math.max(0,CH-(A.clientHeight-22))));$('lane').style.transform='translate('+(p-t*pps)+'px,'+(-vy)+'px)';
   if(r.width!==w){r.width=w;r.height=22;}
   const q=r.getContext('2d');q.clearRect(0,0,w,22);q.fillStyle='#8a8a8a';q.font='11px system-ui,sans-serif';q.textAlign='center';
   const h=pps>=40?1:pps>=15?2.5:5; // линейка: время, точка, время, точка…
@@ -325,19 +326,20 @@ function build(){
   kick();
   const L=$('lane');L.innerHTML='';
   // Строки таймлайна: наложения и эффекты видны, только если на них есть клипы
-  const has=n=>clips.some(c=>c.tr===n),rows=[has(1)&&1,0,2,3,has(4)&&4].filter(r=>r!==false);
+  const has=n=>clips.some(c=>c.tr===n);
   const LN={},cnt={}; // ряды: клипы, которые пересекаются по времени, встают друг под другом
   [1,2,3,4].forEach(tr=>{const ends=[];clips.filter(c=>c.tr===tr).sort((a,b)=>a.start-b.start).forEach(c=>{let i=ends.findIndex(e=>e<=c.start+.001);if(i<0){i=ends.length;ends.push(0);}ends[i]=c.start+c.dur;LN[c.id]=i;});cnt[tr]=Math.max(1,ends.length);});
-  LYR={};clips.forEach(c=>{if(c.tr===1)LYR[c.id]=c.lay!=null?c.lay:LN[c.id];});const lyv=Object.values(LYR),lo1=lyv.length?Math.min(...lyv):0,hi1=lyv.length?Math.max(...lyv):0;cnt[1]=Math.max(1,hi1-lo1+1);
-  Y={};let y=4;rows.forEach(r=>{Y[r]=y;y+=r===0?56:34*(cnt[r]||1)+2;});
+  LYR={};clips.forEach(c=>{if(c.tr===1)LYR[c.id]=c.lay!=null?c.lay:LN[c.id];});const lyv=Object.values(LYR),hi=Math.max(-1,...lyv.filter(v=>v>=0)),lo=Math.min(0,...lyv.filter(v=>v<0)),LY={};
+  Y={};let y=4;for(let l=hi;l>=0;l--){LY[l]=y;y+=36;}Y[0]=y;y+=56;for(let l=-1;l>=lo;l--){LY[l]=y;y+=36;} // слои выше основного — над ним, ниже — под ним, сколько угодно
+  [2,3,4].forEach(r=>{if(r===4&&!has(4))return;Y[r]=y;y+=34*(cnt[r]||1)+2;});CH=y+40;
   for(const c of clips){
     const m=media[c.m],d=document.createElement('div');
     d.className='clip t'+c.tr+(c.id===sel?' sel':'');d.dataset.id=c.id;
-    d.style.cssText='left:'+c.start*pps+'px;width:'+c.dur*pps+'px;top:'+(Y[c.tr]+(c.tr?2+(c.tr===1?hi1-LYR[c.id]:(LN[c.id]||0))*34:4))+'px;height:'+(c.tr?28:48)+'px';
+    d.style.cssText='left:'+c.start*pps+'px;width:'+c.dur*pps+'px;top:'+(c.tr===1?LY[LYR[c.id]]+2:c.tr?Y[c.tr]+2+(LN[c.id]||0)*34:Y[0]+4)+'px;height:'+(c.tr?28:48)+'px';
     if(m&&m.type==='video'&&m.thumb)d.style.backgroundImage='url('+m.thumb+')';
     if(m&&m.type==='image')d.style.backgroundImage='url('+m.url+')';
     if(c.kf)[...new Set(Object.values(c.kf).flat().map(q=>q[0]))].forEach(r=>{const m=document.createElement('i');m.className='kfm';m.style.left=(r*pps)+'px';d.append(m);}); // ромбики ключей
-    if(c.tr>1){const s=document.createElement('span');s.textContent=c.text||(m?m.name:'');d.append(s);}
+    if(c.tr>1||c.name){const s=document.createElement('span');s.textContent=c.name||c.text||(m?m.name:'');d.append(s);}
     if(c.id===sel)['l','r'].forEach(h=>{const e=document.createElement('div');e.className='h '+h;e.dataset.h=h;d.append(e);}); // ручки обрезки
     L.append(d);
   }
@@ -352,6 +354,15 @@ function build(){
   buildToolbar();
 }
 function select(id){sel=id;build();}
+function ask(title,val,cb){md("<b></b><input id='rn'><div class='row'><button id='rc2'>Отмена</button><button class='pri' id='rk'>OK</button></div>");$('mc').firstChild.textContent=title;$('rn').value=val||'';$('rc2').onclick=closeMd;$('rk').onclick=()=>{const v=$('rn').value.trim();closeMd();if(v)cb(v);};}
+const PL=[['bri','Яркость',0,2,.01,1],['con','Контраст',0,2,.01,1],['sat','Насыщенность',0,2,.01,1],['hue','Оттенок',-180,180,1,0],['sep','Сепия',0,1,.01,0],['gry','Чёрно-белый',0,1,.01,0],['blr','Размытие',0,20,.5,0],['glw','Свечение',0,1,.01,0]];
+function layerPanel(){ // отдельная панель слоя: название, цветокоррекция, свечение
+  const c=clips.find(k=>k.id===sel);if(!c)return toast('Сначала выдели клип');
+  const old=JSON.stringify(c),fx=c.tr<2;
+  sheet('Настройки слоя',"<input id='ln' placeholder='Название слоя' style='width:100%;margin-bottom:6px;height:40px;border:0;border-radius:12px;background:#2a2a2a;color:#fff;padding:0 12px;font:inherit;user-select:text;-webkit-user-select:text'><div id='pr'></div>"+(fx?"<div class='row'><span>Цвет свечения</span><input type='color' id='gc'></div>":''),()=>{c.name=$('ln').value.trim()||undefined;save();build();},()=>{Object.keys(c).forEach(k=>delete c[k]);Object.assign(c,JSON.parse(old));build();});
+  $('ln').value=c.name||'';if(fx){$('gc').value=c.glc||'#ffffff';$('gc').oninput=()=>{c.glc=$('gc').value;};sliders($('pr'),c,PL);}
+}
+
 // Прилипание к курсору и краям других клипов
 function snapTo(s,c){
   if(!snapOn)return s;
@@ -365,14 +376,14 @@ function snapTo(s,c){
 A.onpointerdown=e=>{
   A.setPointerCapture(e.pointerId);
   const cl=e.target.closest('.clip'),c=cl&&clips.find(k=>k.id===cl.dataset.id);
-  g={x:e.clientX,t0:t,tgt:e.target,moved:false,mode:'pan',c,h:e.target.dataset.h};
+  g={x:e.clientX,y:e.clientY,v0:vy,t0:t,tgt:e.target,moved:false,mode:'pan',c,h:e.target.dataset.h};
   if(c&&g.h&&c.id===sel){g.mode='trim';g.c0={...c};}
   else if(c)g.timer=setTimeout(()=>{if(!g.moved){g.mode='move';g.c0={...c};if(navigator.vibrate)navigator.vibrate(15);select(c.id);}},350);
 };
 A.onpointermove=e=>{
-  if(!g)return;const dx=e.clientX-g.x,ds=dx/pps;
-  if(Math.abs(dx)>6){g.moved=true;if(playing)pause();} // листаешь таймлайн, и предпросмотр останавливается
-  if(g.mode==='pan'){if(g.moved)t=Math.max(0,Math.min(total(),g.t0-ds));}
+  if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y,ds=dx/pps;
+  if(Math.abs(dx)>6||Math.abs(dy)>6){g.moved=true;if(g.mode==='pan'&&!g.ax)g.ax=Math.abs(dx)>=Math.abs(dy)?'x':'y';if(playing&&g.ax!=='y')pause();} // листаешь таймлайн, и предпросмотр останавливается
+  if(g.mode==='pan'){if(g.ax==='x')t=Math.max(0,Math.min(total(),g.t0-ds));else if(g.ax==='y')vy=Math.max(0,g.v0-dy);} // палец вбок листает время, вверх-вниз листает слои
   else if(g.mode==='move'){g.c.start=snapTo(Math.max(0,g.c0.start+ds),g.c);build();}
   else{ // обрезка
     const c=g.c,c0=g.c0,m=media[c.m],vid=m&&m.type!=='image';
@@ -384,9 +395,9 @@ A.onpointermove=e=>{
 A.onpointerup=A.onpointercancel=()=>{
   if(!g)return;clearTimeout(g.timer);const o=g;g=null;$('ph').classList.remove('sn');
   if(o.mode!=='pan'){save();build();return;}
-  if(!o.moved){const hn=o.tgt.closest('.hint');if(o.tgt.closest('.add')){addTrack=0;$('file').accept='video/*,image/*';$('file').click();}else if(hn){hn.dataset.a==='audio'?pick(2)():addText();}else select(o.c?o.c.id:null);}
+  if(!o.moved){const hn=o.tgt.closest('.hint');if(o.tgt.closest('.add')){addTrack=0;$('file').accept='video/*,image/*';$('file').click();}else if(hn){hn.dataset.a==='audio'?pick(2)():addText();}else{const was=o.c&&o.c.id===sel;select(o.c?o.c.id:null);if(was&&o.c.tr<2)layerPanel();}}
 };
-A.onwheel=e=>{if(e.ctrlKey){e.preventDefault();pps=Math.max(8,Math.min(300,pps*(e.deltaY<0?1.15:.87)));build();}};
+A.onwheel=e=>{if(e.ctrlKey){e.preventDefault();pps=Math.max(8,Math.min(300,pps*(e.deltaY<0?1.15:.87)));build();}else{e.preventDefault();vy=Math.max(0,vy+e.deltaY);}};
 
 // ===== 7. Операции с клипами =====
 function split(){ // разрезать на курсоре
@@ -401,8 +412,8 @@ function addText(){const id='c'+nid++;clips.push({id,tr:3,start:t,in:0,dur:3,tex
 
 // ===== 8. Нижняя панель инструментов (меняется, когда выделен клип) =====
 const pick=n=>()=>{addTrack=n;$('file').accept=n===2?'audio/*':'video/*,image/*';$('file').click();};
-const MAIN=[['cut','Изменить',()=>toast('Выдели клип на таймлайне — появятся его инструменты')],['note','Звук',pick(2)],['text','Текст',addText],['layers','Наложение',pick(1)],['spark','Эффекты',fxSheet],['filter','Фильтры',props],['sub','Субтитры',subAdd],['cube','3D',open3],['cam','Камера',()=>{tab3='c';open3();}],['keys','Сэмплер',sampler],['frame','Формат',fmtSheet],['folder','Библиотека',libOpen]];
-const CL=[['cut','Разделить',split],['text','Текст',editText],['speed','Скорость',props],['snow','Заморозка',freeze],['wave','Анимации',animSheet],['drop','Хромакей',chroma],['mask','Маска',maskSheet],['mask','Вырез',cutStart],['spark','Ключи',kfSheet],['blend','Слой выше',()=>layMove(1)],['blend','Слой ниже',()=>layMove(-1)],['blend','Копир. эфф.',fxCopy],['wave','Встав. эфф.',()=>fxPaste(false)],['wave','Эфф. всем',()=>fxPaste(true)],['text','Код',codeEdit],['blend','Режимы',blendSheet],['vol','Громкость',props],['dup','Дублировать',dup],['trash','Удалить',del]];
+const MAIN=[['cut','Изменить',()=>toast('Выдели клип на таймлайне — появятся его инструменты')],['note','Звук',pick(2)],['text','Текст',addText],['layers','Наложение',pick(1)],['up','Слой выше',()=>layMove(1)],['down','Слой ниже',()=>layMove(-1)],['spark','Эффекты',fxSheet],['filter','Фильтры',props],['sub','Субтитры',subAdd],['cube','3D',open3],['cam','Камера',()=>{tab3='c';open3();}],['keys','Сэмплер',sampler],['frame','Формат',fmtSheet],['folder','Библиотека',libOpen]];
+const CL=[['filter','Настройки',layerPanel],['cut','Разделить',split],['up','Слой выше',()=>layMove(1)],['down','Слой ниже',()=>layMove(-1)],['text','Текст',editText],['speed','Скорость',props],['snow','Заморозка',freeze],['wave','Анимации',animSheet],['drop','Хромакей',chroma],['mask','Маска',maskSheet],['mask','Вырез',cutStart],['spark','Ключи',kfSheet],['blend','Копир. эфф.',fxCopy],['wave','Встав. эфф.',()=>fxPaste(false)],['wave','Эфф. всем',()=>fxPaste(true)],['text','Код',codeEdit],['blend','Режимы',blendSheet],['vol','Громкость',props],['dup','Дублировать',dup],['trash','Удалить',del]];
 function buildToolbar(){
   const tb=$('tb');tb.innerHTML='';
   const add=(i,l,f)=>{const b=document.createElement('button');b.innerHTML='<b>'+ic(i)+'</b>'+l;b.onclick=()=>typeof f==='number'?toast('«'+l+'» появится на этапе '+f):f();tb.append(b);};
@@ -699,29 +710,30 @@ function load3(){
 }
 const c3=()=>clips.find(k=>k.fxn==='3d'&&k.id===sel)||clips.find(k=>k.fxn==='3d'&&t>=k.start&&t<k.start+k.dur);
 function orb(m){return new THREE.Vector3(Math.sin(m.a*D)*Math.cos(m.e*D),Math.sin(m.e*D),Math.cos(m.a*D)*Math.cos(m.e*D)).multiplyScalar(m.d);}
-function mk3(o,src){ // создаём объект: куб, шар, плоскость, цилиндр или плоскость с картинкой/видео
+function mk3(o,src){const m=mk3b(o,src);m.castShadow=m.receiveShadow=true;return m;}
+function mk3b(o,src){ // создаём объект: куб, шар, плоскость, цилиндр или плоскость с картинкой/видео
   const g={cube:()=>new THREE.BoxGeometry(1,1,1),sphere:()=>new THREE.SphereGeometry(.6,24,16),plane:()=>new THREE.PlaneGeometry(2,2),cyl:()=>new THREE.CylinderGeometry(.5,.5,1.2,24),layer:()=>new THREE.PlaneGeometry(2,2),text:()=>new THREE.PlaneGeometry(4,1)}[o.kind]();
   if(o.kind==='text'){const cc=document.createElement('canvas');cc.width=512;cc.height=128;const g2=cc.getContext('2d');g2.font='bold 84px sans-serif';g2.textAlign='center';g2.fillStyle='#fff';g2.strokeStyle='#000';g2.lineWidth=6;g2.strokeText(o.txt,256,92);g2.fillText(o.txt,256,92);
-    return new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cc),transparent:true,side:THREE.DoubleSide,color:o.col}));}
+    return new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:new THREE.CanvasTexture(cc),transparent:true,alphaTest:.05,side:THREE.DoubleSide,color:o.col}));}
   if(o.kind==='layer'){const e=el(src),tx=media[src.m].type==='video'?new THREE.VideoTexture(e):new THREE.Texture(e);
-    return new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tx,transparent:true,side:THREE.DoubleSide}));}
+    return new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:tx,transparent:true,alphaTest:.05,side:THREE.DoubleSide}));}
   return new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:o.col,side:THREE.DoubleSide}));
 }
 function r3(c,W,H){ // рисуем сцену в момент t и отдаём холст
   if(!window.THREE||R3===false)return null;
-  if(!R3){try{R3=new THREE.WebGLRenderer({alpha:true,antialias:true});R3.setClearColor(0x000000,0);}catch(e){R3=false;toast('WebGL недоступен в этом браузере');return null;}}
+  if(!R3){try{R3=new THREE.WebGLRenderer({alpha:true,antialias:true});R3.setClearColor(0x000000,0);R3.shadowMap.enabled=true;}catch(e){R3=false;toast('WebGL недоступен в этом браузере');return null;}}
   if(R3.domElement.width!==W||R3.domElement.height!==H)R3.setSize(W,H,false);
-  const S=c.sc3,tt=t-c.start,Lg=S.light,cm=S.cam;let K=cache[c.id];
-  if(!K){K=cache[c.id]={scene:new THREE.Scene(),m:{},amb:new THREE.AmbientLight(0xffffff),dir:new THREE.DirectionalLight(0xffffff),cam:new THREE.PerspectiveCamera(50,W/H,.1,200)};K.scene.add(K.amb,K.dir);}
+  const S=c.sc3,tt=t-c.start,Lg=ev3(S.light,KL,tt),cm=ev3(S.cam,KC,tt);let K=cache[c.id];
+  if(!K){K=cache[c.id]={scene:new THREE.Scene(),m:{},amb:new THREE.AmbientLight(0xffffff),dir:new THREE.DirectionalLight(0xffffff),cam:new THREE.PerspectiveCamera(50,W/H,.1,200)};K.scene.add(K.amb,K.dir);K.dir.castShadow=true;K.dir.shadow.mapSize.set(1024,1024);K.dir.shadow.bias=-.0005;Object.assign(K.dir.shadow.camera,{left:-12,right:12,top:12,bottom:-12,far:60});K.dir.shadow.camera.updateProjectionMatrix();}
   K.amb.intensity=Lg.a;K.dir.intensity=Lg.d;K.dir.color.set(Lg.c);K.dir.position.set(Lg.lx,Lg.ly,Lg.lz);
   Object.keys(K.m).forEach(id=>{if(!S.objs.some(o=>o.id===id)){K.scene.remove(K.m[id]);delete K.m[id];}});
   for(const o of S.objs){
     const src=o.src&&clips.find(k=>k.id===o.src);if(o.kind==='layer'&&!src)continue;
     const m=K.m[o.id]||(K.m[o.id]=mk3(o,src));if(!m.parent)K.scene.add(m);
-    m.position.set(o.x+o.vx*tt,o.y+o.vy*tt,o.z+o.vz*tt); // скорость движения и вращения заменяют ключевые кадры
-    m.rotation.set(o.rx*D,(o.ry+o.rv*tt)*D,o.rz*D);
-    if(o.kind==='layer'){const e=el(src),w=e.videoWidth||e.naturalWidth,h=e.videoHeight||e.naturalHeight;m.scale.set(o.s*(w&&h?w/h:1),o.s,1);const e2=el(src),ct=e2.currentTime||0;if(m.userData.ct!==ct){m.userData.ct=ct;m.material.map.needsUpdate=true;}}
-    else{m.scale.set(o.s,o.s,o.s);m.material.color.set(o.col);}
+    const O=ev3(o,KO,tt);m.position.set(O.x+o.vx*tt,O.y+o.vy*tt,O.z+o.vz*tt); // скорость движения и вращения заменяют ключевые кадры
+    m.rotation.set(O.rx*D,(O.ry+o.rv*tt)*D,O.rz*D);
+    if(o.kind==='layer'){const e=el(src),w=e.videoWidth||e.naturalWidth,h=e.videoHeight||e.naturalHeight;m.scale.set(O.s*(w&&h?w/h:1),O.s,1);const e2=el(src),ct=e2.currentTime||0;if(m.userData.ct!==ct){m.userData.ct=ct;m.material.map.needsUpdate=true;}}
+    else{m.scale.set(O.s,O.s,O.s);m.material.color.set(o.col);}
   }
   // Камера: свободный облёт или привязка к объекту (дочерняя или режим «окно»)
   const cam=K.cam,tp=new THREE.Vector3(),tq=new THREE.Quaternion(),up=new THREE.Vector3(0,1,0),ob=cm.att&&K.m[cm.att];
@@ -737,7 +749,7 @@ function r3(c,W,H){ // рисуем сцену в момент t и отдаём
 function open3(){
   load3().then(()=>{
     let c=c3();
-    if(!c){c={id:'c'+nid++,tr:4,start:t,in:0,dur:5,fxn:'3d',text:'3D-сцена',sc3:{objs:[],light:{a:.7,d:1,lx:3,ly:5,lz:4,c:'#ffffff'},cam:{fov:50,d:6,a:0,e:15,sm:0,att:null,win:false}}};clips.push(c);save();build();}
+    if(!c){c={id:'c'+nid++,tr:4,start:t,in:0,dur:5,fxn:'3d',text:'3D-сцена',sc3:{objs:[],light:{a:.55,d:.8,lx:3,ly:5,lz:4,c:'#ffffff'},cam:{fov:50,d:6,a:0,e:15,sm:0,att:null,win:false}}};clips.push(c);save();build();}
     enter3(c);
   }).catch(()=>toast('Не удалось загрузить Three.js: нужен доступ к cdnjs.cloudflare.com'));
 }
@@ -745,6 +757,7 @@ function sheet3(){ // шторка с вкладками «Объекты», «�
   const c=m3?cur3:c3(),S=c.sc3,old=JSON.stringify(S);cur3=c;on3=true;
   sheet('3D-сцена (облёт камеры — пальцем по предпросмотру)',`<div class='row' id='tb3'></div><div id='b3'></div>`,()=>{on3=false;save();},()=>{on3=false;c.sc3=JSON.parse(old);delete cache[c.id];});
   const NM={cube:'Куб',sphere:'Шар',plane:'Плоскость',cyl:'Цилиндр',layer:'Слой',text:'Текст'};
+  const kfn=h=>(k,v)=>{if(h.kf&&h.kf[k])setKf(h,k,+(t-c.start).toFixed(2),v);}; // слайдер при ключах двигает ключ
   const addObj=(kind,src)=>{const o={id:'o'+nid++,kind,src,col:'#4fd1e5',x:0,y:0,z:0,rx:0,ry:0,rz:0,s:1,vx:0,vy:0,vz:0,rv:0};S.objs.push(o);s3=o.id;};
   const show=()=>{
     const tb=$('tb3'),B=$('b3');tb.innerHTML='';B.innerHTML='';
@@ -752,19 +765,20 @@ function sheet3(){ // шторка с вкладками «Объекты», «�
     const bt=(l,f)=>{const b=document.createElement('button');b.className='ch';b.textContent=l;b.onclick=()=>{f();show();};B.append(b);};
     if(tab3==='o'){
       ['cube','sphere','plane','cyl'].forEach(k=>bt('+ '+NM[k],()=>addObj(k)));
+      bt('+ Пол (ловит тень)',()=>{addObj('plane');Object.assign(S.objs[S.objs.length-1],{rx:-90,y:0,s:4,col:'#9aa0a6'});});
       bt('+ Выделенный клип как плоскость',()=>{const k=clips.find(q=>q.id===sel),m=k&&media[k.m];if(!m||m.type==='audio')return toast('Выдели на таймлайне видео или картинку');addObj('layer',k.id);});
-      S.objs.forEach(o=>{const b=document.createElement('button');b.className='ch'+(s3===o.id?' on':'');b.textContent=NM[o.kind];b.onclick=()=>{s3=o.id;show();};B.append(b);});
+      S.objs.forEach(o=>{const b=document.createElement('button');b.className='ch'+(s3===o.id?' on':'');b.textContent=o.name||NM[o.kind];b.onclick=()=>{s3=o.id;show();};B.append(b);});
       const o=S.objs.find(q=>q.id===s3);
       if(o){const box=document.createElement('div');B.append(box);
-        sliders(box,o,[['x','X',-5,5,.05,0],['y','Y',-5,5,.05,0],['z','Z',-5,5,.05,0],['rx','Поворот X',-180,180,1,0],['ry','Поворот Y',-180,180,1,0],['rz','Поворот Z',-180,180,1,0],['s','Масштаб',.1,4,.05,1],['vx','Движ. X/с',-3,3,.05,0],['vy','Движ. Y/с',-3,3,.05,0],['vz','Движ. Z/с',-3,3,.05,0],['rv','Вращ. °/с',-360,360,5,0]]);
+        sliders(box,o,[['x','X',-5,5,.05,0],['y','Y',-5,5,.05,0],['z','Z',-5,5,.05,0],['rx','Поворот X',-180,180,1,0],['ry','Поворот Y',-180,180,1,0],['rz','Поворот Z',-180,180,1,0],['s','Масштаб',.1,4,.05,1],['vx','Движ. X/с',-3,3,.05,0],['vy','Движ. Y/с',-3,3,.05,0],['vz','Движ. Z/с',-3,3,.05,0],['rv','Вращ. °/с',-360,360,5,0]],kfn(o));
         if(o.kind!=='layer'){const ci=document.createElement('input');ci.type='color';ci.value=o.col;ci.oninput=()=>{o.col=ci.value;};B.append(ci);}
         bt('Удалить объект',()=>{S.objs=S.objs.filter(q=>q!==o);if(S.cam.att===o.id)S.cam.att=null;s3=null;});}
     }else if(tab3==='l'){
-      sliders(B,S.light,[['a','Рассеянный',0,2,.05,.7],['d','Направленный',0,3,.05,1],['lx','Свет X',-10,10,.1,3],['ly','Свет Y',-10,10,.1,5],['lz','Свет Z',-10,10,.1,4]]);
+      sliders(B,S.light,[['a','Рассеянный',0,2,.05,.55],['d','Направленный',0,3,.05,.8],['lx','Свет X',-10,10,.1,3],['ly','Свет Y',-10,10,.1,5],['lz','Свет Z',-10,10,.1,4]],kfn(S.light));
       const ci=document.createElement('input');ci.type='color';ci.value=S.light.c;ci.oninput=()=>{S.light.c=ci.value;};B.append(ci);
     }else{
       const cm=S.cam;
-      sliders(B,cm,[['fov','Угол обзора',20,120,1,50],['d','Дистанция',1,20,.1,6],['a','Облёт гор.',-180,180,1,0],['e','Облёт верт.',-85,85,1,15],['sm','Сглаживание',0,.95,.05,0]]);
+      sliders(B,cm,[['fov','Угол обзора',20,120,1,50],['d','Дистанция',1,20,.1,6],['a','Облёт гор.',-180,180,1,0],['e','Облёт верт.',-85,85,1,15],['sm','Сглаживание',0,.95,.05,0]],kfn(cm));
       bt('Привязать камеру к объекту…',()=>objWin(S,'attach')); // окно со списком объектов
       bt(cm.win?'Режим «окно»: включён':'Режим «окно»: выключен',()=>{cm.win=!cm.win;});
       bt('Отвязать',()=>{cm.att=null;});
@@ -866,50 +880,49 @@ function sampler(){
 }
 
 // ===== Автосохранение проекта в IndexedDB: клипы и файлы, при открытии всё возвращается =====
-let pdb=null,ptm=0,pdone={},pready=false; // pdone — файлы, уже записанные в хранилище
+let pdb=null,ptm=0,pdone={},pready=false,pid='cur',pname='Мой проект',pidx=[]; // pidx — список проектов; файлы проекта лежат под ключами m:<проект>:<файл>
+const mkey=id=>pid==='cur'?'m:'+id:'m:'+pid+':'+id,pget=k=>new Promise((ok,no)=>{const q=pdb.transaction('p').objectStore('p').get(k);q.onsuccess=()=>ok(q.result);q.onerror=no;});
 function pOpen(){return new Promise(ok=>{try{const r=indexedDB.open('capcutproj',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>ok(r.result);r.onerror=()=>ok(null);}catch(e){ok(null);}});}
-function pSave(){
-  clearTimeout(ptm);
-  ptm=setTimeout(()=>{
-    if(!pready){pSave();return;}if(!pdb)return;
-    try{const tx=pdb.transaction('p','readwrite'),os=tx.objectStore('p');
-      Object.values(media).forEach(m=>{if(m.blob&&!pdone[m.id]&&clips.some(c=>c.m===m.id)){os.put({id:m.id,type:m.type,name:m.name,dur:m.dur,thumb:m.thumb,w:m.w,h:m.h,blob:m.blob},'m:'+m.id);pdone[m.id]=1;}});
-      os.put({clips,ratio,res,nid},'cur');
-      tx.onabort=()=>toast('Автосохранение не удалось (возможно, нет места)');
-    }catch(e){toast('Автосохранение недоступно');}
-  },800);
+function pSave(){clearTimeout(ptm);ptm=setTimeout(pFlush,800);}
+function pFlush(){
+  clearTimeout(ptm);if(!pready){pSave();return;}if(!pdb)return;
+  try{const tx=pdb.transaction('p','readwrite'),os=tx.objectStore('p');
+    Object.values(media).forEach(m=>{if(m.blob&&!pdone[m.id]&&clips.some(c=>c.m===m.id)){os.put({id:m.id,type:m.type,name:m.name,dur:m.dur,thumb:m.thumb,w:m.w,h:m.h,blob:m.blob},mkey(m.id));pdone[m.id]=1;}});
+    os.put({clips,ratio,res,nid,name:pname},pid);
+    const m0=clips.map(c=>media[c.m]).find(m=>m&&m.thumb),e={id:pid,name:pname,n:clips.length,dur:total(),thumb:m0?m0.thumb:'',ts:Date.now()},i=pidx.findIndex(x=>x.id===pid);
+    if(i<0)pidx.push(e);else pidx[i]=e;os.put(pidx,'idx');os.put(pid,'last');
+    tx.onabort=()=>toast('Автосохранение не удалось (возможно, нет места)');
+  }catch(e){toast('Автосохранение недоступно');}
 }
-async function pLoad(){
-  pdb=await pOpen();
+async function pLoad(id){
+  if(!pdb)pdb=await pOpen();
   if(!pdb){pready=true;toast('Хранилище недоступно: проект не будет сохраняться');return;}
   try{
-    const get=k=>new Promise((ok,no)=>{const q=pdb.transaction('p').objectStore('p').get(k);q.onsuccess=()=>ok(q.result);q.onerror=no;});
-    const s=await get('cur');
-    if(s&&s.clips&&s.clips.length){
-      for(const id of new Set(s.clips.map(c=>c.m).filter(Boolean))){
-        const r=await get('m:'+id);if(!r)continue;
+    pidx=(await pget('idx'))||[];if(!pidx.length&&await pget('cur'))pidx=[{id:'cur',name:'Мой проект',n:1,dur:0,thumb:'',ts:0}];
+    id=id||await pget('last')||'cur';pid=id;const s=await pget(id);
+    if(s&&s.clips){pname=s.name||'Мой проект';
+      for(const mid of new Set(s.clips.map(c=>c.m).filter(Boolean))){
+        const r=await pget(mkey(mid));if(!r)continue;
         const m={...r,url:URL.createObjectURL(r.blob)};
         if(m.type==='image'){m.img=new Image();m.img.src=m.url;await once(m.img,'load');}
-        media[id]=m;pdone[id]=1;
+        media[mid]=m;pdone[mid]=1;
       }
       clips=s.clips.filter(c=>!c.m||media[c.m]);ratio=s.ratio;res=s.res||res;nid=Math.max(nid,s.nid||1);t=0;sel=null;
-      rsLabel();fitCanvas();save();build();toast('Проект восстановлен');
+      rsLabel();fitCanvas();save();build();toast('Проект: '+pname);
     }
   }catch(e){toast('Не удалось восстановить проект');}
   pready=true;
 }
-function newProj(){
-  pause();clips=[];media={};els={};libM={};sel=null;t=0;pdone={};ratio=[9,16];
-  Object.keys(kc).forEach(k=>delete kc[k]);cache={};hist.length=0;hi=-1;save();fitCanvas();build();
-  if(pdb)try{pdb.transaction('p','readwrite').objectStore('p').clear();}catch(e){}
-  toast('Новый проект');
-}
+function resetProj(){pause();clips=[];media={};els={};libM={};sel=null;t=0;vy=0;pdone={};ratio=[9,16];Object.keys(kc).forEach(k=>delete kc[k]);cache={};hist.length=0;hi=-1;}
+function newProj(){pFlush();resetProj();pid='p'+Date.now();pname='Проект '+(pidx.length+1);save();fitCanvas();build();toast('Новый проект');}
+async function openProj(id){pFlush();resetProj();pready=false;await pLoad(id);save();fitCanvas();build();}
+function projDel(id){try{const os=pdb.transaction('p','readwrite').objectStore('p');os.delete(id);const q=os.getAllKeys();q.onsuccess=()=>{const pre=id==='cur'?'m:m':'m:'+id+':';q.result.forEach(k=>{if(String(k).startsWith(pre))os.delete(k);});};pidx=pidx.filter(x=>x.id!==id);os.put(pidx,'idx');}catch(e){toast('Не удалось удалить');}}
 function projSheet(){ // кнопка «×» вверху слева
-  sheet('Проект',`<button class='ch' id='pp1'>Сохранить кадр (PNG)</button><button class='ch' id='pp2'>Новый проект</button><button class='ch' id='pp4'>В главное меню</button><div class='wr' id='pp3'></div>`);
+  sheet('Проект',`<button class='ch' id='pp1'>Сохранить кадр (PNG)</button><button class='ch' id='pp2'>Новый проект</button><button class='ch' id='pp4'>В главное меню</button><button class='ch' id='pp5'>Переименовать проект</button><div class='wr' id='pp3'></div>`);
   $('pp4').onclick=()=>{$('sh').classList.remove('open');homeShow();};
   $('pp1').onclick=()=>{nofr=true;draw();cv.toBlob(b=>{nofr=false;b?saveFile('frame.png',b):toast('Не удалось снять кадр');});};
-  let sure=0;$('pp2').onclick=()=>{if(!sure){sure=1;$('pp2').textContent='Точно очистить проект?';return;}newProj();$('sh').classList.remove('open');};
-  $('pp3').textContent='Проект сохраняется сам и вернётся при следующем открытии.';
+  $('pp2').onclick=()=>{newProj();$('sh').classList.remove('open');};
+  $('pp3').textContent='Проект сохраняется сам. Все проекты — в главном меню.';$('pp5').onclick=()=>{$('sh').classList.remove('open');ask('Название проекта',pname,v=>{pname=v;save();});};
 }
 
 // ===== Жесты в предпросмотре: тап выделяет клип, палец двигает, два пальца масштабируют и вращают =====
@@ -926,13 +939,38 @@ function selFrame(){ // белая рамка с угловыми маркера
   cx.save();cx.translate(b.x,b.y);cx.rotate(b.r);cx.strokeStyle=sg.r?'#4fd1e5':'#fff';cx.lineWidth=Math.max(2,cv.width*.004);cx.strokeRect(-b.w/2,-b.h/2,b.w,b.h);
   const q=cv.width*.025;cx.fillStyle='#fff';[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([i,j])=>cx.fillRect(i*b.w/2-q/2,j*b.h/2-q/2,q,q));cx.restore();
 }
+const hq=document.createElement('canvas').getContext('2d',{willReadFrequently:true});hq.canvas.width=hq.canvas.height=9;
+function inShape(c,nx,ny){ // точка (−1…1 от центра клипа) внутри маски и выреза? Те же формы, что рисуются
+  const hq2=hq;
+  if(c.mk){const m=c.mk,z=m.sz||.8,P=new Path2D();let ok;
+    if(m.t==='circle'){ok=(nx*nx+ny*ny)<=z*z;}
+    else if(m.t==='rect'){ok=Math.abs(nx)<=z&&Math.abs(ny)<=z;}
+    else{P.moveTo(0,z);P.bezierCurveTo(-z*1.4,z*.1,-z,-z*1.1,0,-z*.35);P.bezierCurveTo(z,-z*1.1,z*1.4,z*.1,0,z);ok=hq2.isPointInPath(P,nx,ny);}
+    if(m.inv?ok:!ok)return false;}
+  const k=c.cut;
+  if(k&&k.p&&k.p.length){const line=k.m==='top'||k.m==='bot',P=k.p.map(([u,v])=>[(u-.5)*2,(v-.5)*2]);
+    if(P.length>=(line?2:3)){let Q=P.slice();
+      if(line){const sg=P[P.length-1][0]>=P[0][0]?1:-1,y=k.m==='top'?-2:2;Q.unshift([-sg*2,P[0][1]]);Q.push([sg*2,P[P.length-1][1]]);Q.push([Q[Q.length-1][0],y],[Q[0][0],y]);}
+      const W=new Path2D();if(k.m!=='out')W.rect(-2,-2,4,4);Q.forEach((q,i)=>i?W.lineTo(q[0],q[1]):W.moveTo(q[0],q[1]));W.closePath();
+      if(!hq2.isPointInPath(W,nx,ny,k.m==='out'?'nonzero':'evenodd'))return false;}}
+  return true;
+}
+function opq(c,b,px,py){ // касание ловит только видимое: по форме маски/выреза и по непрозрачным пикселям
+  const m=media[c.m];if((c.tr!==0&&c.tr!==1)||!m||m.type==='audio')return true;
+  const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r);let lx=dx*co-dy*si;const ly=dx*si+dy*co;if(c.mir)lx=-lx;
+  if(!inShape(c,lx/b.w*2,ly/b.h*2))return false;
+  const e=el(c);let s=e,sw=e.videoWidth||e.naturalWidth,sh=e.videoHeight||e.naturalHeight;if(!sw)return true;
+  if(c.ck){s=keyed(c,e,sw,sh);sw=s.width;sh=s.height;}else if(m.type==='video')return true;
+  const r=Math.max(2,sw*.012),x0=(lx/b.w+.5)*sw-r,y0=(ly/b.h+.5)*sh-r;
+  try{hq.clearRect(0,0,9,9);hq.drawImage(s,Math.max(0,x0),Math.max(0,y0),Math.min(sw,2*r),Math.min(sh,2*r),0,0,9,9);const d=hq.getImageData(0,0,9,9).data;for(let i=3;i<d.length;i+=4)if(d[i]>24)return true;return false;}catch(x){return true;}
+}
 function hitSel(px,py){const c=clips.find(k=>k.id===sel),b=c&&HB[c.id];if(!b||t<c.start||t>=c.start+c.dur)return null;
-  const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r),lx=dx*co-dy*si,ly=dx*si+dy*co;return Math.abs(lx)<=b.w/2+12&&Math.abs(ly)<=b.h/2+12?c:null;}
+  const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r),lx=dx*co-dy*si,ly=dx*si+dy*co;return Math.abs(lx)<=b.w/2+12&&Math.abs(ly)<=b.h/2+12&&opq(c,b,px,py)?c:null;}
 function hitTest(px,py){ // что лежит под пальцем: сверху вниз текст, потом слои как нарисованы
   for(const c of [...clips.filter(k=>k.tr===3).reverse(),...DRAW.slice().reverse()]){
     const b=HB[c.id];if(!b||t<c.start||t>=c.start+c.dur)continue;
     const dx=px-b.x,dy=py-b.y,co=Math.cos(-b.r),si=Math.sin(-b.r),lx=dx*co-dy*si,ly=dx*si+dy*co;
-    if(Math.abs(lx)<=b.w/2&&Math.abs(ly)<=b.h/2)return c;
+    if(Math.abs(lx)<=b.w/2&&Math.abs(ly)<=b.h/2&&opq(c,b,px,py))return c;
   }
   return null;
 }
@@ -1001,9 +1039,12 @@ function cutStart(){
 (function(){const st=document.createElement('style');st.textContent='.kfm{position:absolute;top:2px;width:9px;height:9px;margin-left:-5px;background:#ffd400;transform:rotate(45deg);pointer-events:none;z-index:2}';document.head.appendChild(st);})();
 const KP=['x','y','z','sc','rot','op','rx','ry'];
 const kd=(c,p)=>p==='sc'?(c.sc||1):p==='op'?(c.op??1):(c[p]||0);
-function kv(c,p,d){ // значение в момент t: между ключами плавно, до первого и после последнего держится
-  const a=c.kf&&c.kf[p];if(!a||!a.length)return d;const r=t-c.start;if(r<=a[0][0])return a[0][1];const n=a.length-1;if(r>=a[n][0])return a[n][1];
-  let i=0;while(a[i+1][0]<r)i++;const u=(r-a[i][0])/(a[i+1][0]-a[i][0]),e=u*u*(3-2*u);return a[i][1]+(a[i+1][1]-a[i][1])*e;}
+function ip(a,r,d){if(!a||!a.length)return d;if(r<=a[0][0])return a[0][1];const n=a.length-1;if(r>=a[n][0])return a[n][1];let i=0;while(a[i+1][0]<r)i++;const u=(r-a[i][0])/(a[i+1][0]-a[i][0]),e=u*u*(3-2*u);return a[i][1]+(a[i+1][1]-a[i][1])*e;} // между ключами плавно
+function kv(c,p,d){return ip(c.kf&&c.kf[p],t-c.start,d);}
+const KO=['x','y','z','rx','ry','rz','s'],KL=['lx','ly','lz','a','d'],KC=['a','e','d','fov']; // что можно анимировать в 3D: объект, свет, камера
+const ev3=(h,ps,tt)=>{const r={...h};if(h.kf)ps.forEach(p=>{if(h.kf[p])r[p]=ip(h.kf[p],tt,h[p]);});return r;};
+function kfBake3(h,c){if(h.kf)for(const p in h.kf)if(h.kf[p].length)h[p]=ip(h.kf[p],t-c.start,h[p]);}
+function kfSync3(h,c){const r=t-c.start;if(r<0||r>c.dur)return;for(const p in h.kf)if(h.kf[p].length&&typeof h[p]==='number')setKf(h,p,r,h[p]);}
 function setKf(c,p,r,v){const a=(c.kf[p]=c.kf[p]||[]),i=a.findIndex(q=>Math.abs(q[0]-r)<.04);if(i>=0)a[i]=[a[i][0],v];else{a.push([r,v]);a.sort((x,y)=>x[0]-y[0]);}}
 function kfSync(c){const r=t-c.start;if(r<0||r>c.dur)return;for(const p in c.kf)if(c.kf[p].length&&typeof c[p]==='number')setKf(c,p,r,c[p]);} // двигаешь клип с ключами, и ключ ставится сам
 function kfBake(c){if(c.kf)for(const p in c.kf)if(c.kf[p].length)c[p]=kv(c,p,kd(c,p));}
@@ -1016,9 +1057,13 @@ function kfSheet(){
   $('kn').onclick=()=>{const r=t-c.start,n=[...new Set(Object.values(c.kf||{}).flat().map(q=>q[0]))].sort((a,b)=>a-b).find(x=>x>r+.05);if(n!==undefined)t=c.start+n;tx();};
   $('kx').onclick=()=>{delete c.kf;tx();};tx();
 }
-let DRAW=[],LYR={};const ORD=c=>{const l=LYR[c.id]||0;return c.tr===0?0:l>=0?l+1:-1;}; // порядок слоёв: основная 0, наложения выше, слой -1 под основной
-function layMove(d){const c=clips.find(k=>k.id===sel);if(!c||c.tr!==1)return toast('Выдели наложение');c.lay=Math.max(-1,(LYR[c.id]||0)+d);save();build();toast(c.lay<0?'Наложение под основным видео':'Слой '+(c.lay+1));}
-const FXK=['mk','cut','bm','bri','con','sat','op','ai','ao','ck','vi','vo','kf','mir']; let fxBuf=null;
+let DRAW=[],LYR={};const ORD=c=>{const l=LYR[c.id]||0;return c.tr===0?0:l>=0?l+1:l;}; // порядок слоёв: основная 0, наложения выше, слой -1 под основной
+function layMove(d){ // слой выше/ниже: работает и для основной дорожки, и для наложений, слоёв сколько угодно
+  const c=clips.find(k=>k.id===sel),m=c&&media[c.m];if(!c||c.tr>1||!m||m.type==='audio')return toast('Выдели видео или картинку на таймлайне');
+  const oth=clips.filter(k=>k!==c&&k.tr<2).map(ORD),o=ORD(c);let n=o+d;if(n===0)n=d>0?1:-1;
+  if(n>Math.max(0,...oth)+1||n<Math.min(0,...oth)-1)return toast(d>0?'Выше уже нет слоёв':'Ниже уже нет слоёв');
+  c.tr=1;c.lay=n>0?n-1:n;save();build();toast(n>0?'Слой '+n+' над основным':'Слой '+(-n)+' под основным');}
+const FXK=['mk','cut','bm','bri','con','sat','op','ai','ao','ck','vi','vo','kf','mir','hue','sep','gry','blr','glw','glc']; let fxBuf=null;
 function fxCopy(){const c=clips.find(k=>k.id===sel);if(!c)return;fxBuf={};FXK.forEach(k=>{if(c[k]!==undefined)fxBuf[k]=JSON.parse(JSON.stringify(c[k]));});toast('Эффекты скопированы');}
 function fxPaste(all){const c=clips.find(k=>k.id===sel);if(!fxBuf)return toast('Сначала нажми «Копир. эфф.» на нужном клипе');if(!c)return;
   (all?clips.filter(k=>k.tr===c.tr&&k.tr<4):[c]).forEach(k=>FXK.forEach(f=>{delete k[f];if(fxBuf[f]!==undefined)k[f]=JSON.parse(JSON.stringify(fxBuf[f]));}));save();build();toast(all?'Применено ко всем клипам дорожки':'Эффекты вставлены');}
@@ -1089,11 +1134,13 @@ function mkHelp(K){ // сетка пола, оси, лампа, камера, р
 const rc=()=>window.THREE&&(rc.r=rc.r||new THREE.Raycaster());
 function pick3(e){ // тап по объекту в сцене выбирает его
   const K=cache[cur3.id],r=RV.domElement.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);
-  rc().setFromCamera(v,EC);const h=rc().intersectObjects(Object.values(K.m),false)[0];
+  rc().setFromCamera(v,EC);const h=rc().intersectObjects(Object.values(K.m),false)[0],hb=K.help&&rc().intersectObject(K.help.bulb,false)[0];
+  if(hb&&(!h||hb.distance<h.distance)){s3='light';toast('Свет выбран: тяни цветные стрелки');return;}
   s3=h?Object.keys(K.m).find(k=>K.m[k]===h.object):null;
 }
 let gzMode='move';
-function tgt3(K){ // что сейчас выбрано: 3D-объект или 2D-клип
+function tgt3(K){ // что сейчас выбрано: свет, 3D-объект или 2D-клип
+  if(s3==='light'&&K.help)return{k:'l',o:cur3.sc3.light,m:K.help.bulb};
   const o=s3&&cur3.sc3.objs.find(q=>q.id===s3);if(o&&K.m[s3])return{k:'o',o,m:K.m[s3]};
   const c=clips.find(q=>q.id===sel),m=c&&K.mir&&K.mir[c.id];return m&&m.visible?{k:'c',o:c,m}:null;
 }
@@ -1111,7 +1158,7 @@ function gzBuild(K,mode,two){ // цветные стрелки, кольца и 
 function gzUpd(K){
   if(!K.gz){K.gz=new THREE.Group();K.gz.visible=false;K.scene.add(K.gz);K.gzM='';}
   const T=inCam?null:tgt3(K);if(!T)return;
-  if(K.gzM!==gzMode+(T.k==='c'))gzBuild(K,gzMode,T.k==='c');
+  const gm=T.k==='l'?'move':gzMode;if(K.gzM!==gm+(T.k==='c'))gzBuild(K,gm,T.k==='c');
   T.m.getWorldPosition(K.gz.position);K.gz.scale.setScalar(EC.position.distanceTo(K.gz.position)*.14);K.gz.visible=true;
 }
 const A3v=i=>new THREE.Vector3(i===0?1:0,i===1?1:0,i===2?1:0); // THREE грузится позже, поэтому не константа
@@ -1119,15 +1166,15 @@ function axT(ray,P,d){const w=ray.origin.clone().sub(P),b=ray.direction.dot(d),d
 function scrAng(e,P){const r=RV.domElement.getBoundingClientRect(),v=P.clone().project(EC);return Math.atan2(e.clientY-(r.top+(1-v.y)/2*r.height),e.clientX-(r.left+(v.x+1)/2*r.width));}
 function gz3(e,g){ // палец на стрелке: тянем выбранное
   const K=cache[cur3.id],T=K&&K.gz&&tgt3(K);if(!T)return false;const R=ray3(e),h=R.intersectObjects(K.gz.children,false)[0];if(!h)return false;
-  const ax=h.object.userData.ax,P=K.gz.position.clone(),o=T.o;if(T.k==='c')kfBake(o);
-  g.gz={T,ax,P,mode:gzMode,t0:axT(R.ray,P,A3v(ax)),a0:scrAng(e,P),s:T.k==='o'?{x:o.x,y:o.y,z:o.z,rx:o.rx,ry:o.ry,rz:o.rz,s:o.s}:{x:o.x||0,y:o.y||0,z:o.z||0,r:o.rot||0,rx:o.rx||0,ry:o.ry||0,s:o.sc||1}};return true;
+  const ax=h.object.userData.ax,P=K.gz.position.clone(),o=T.o;if(T.k==='c')kfBake(o);else kfBake3(o,cur3);
+  g.gz={T,ax,P,mode:T.k==='l'?'move':gzMode,t0:axT(R.ray,P,A3v(ax)),a0:scrAng(e,P),s:T.k==='l'?{x:o.lx,y:o.ly,z:o.lz}:T.k==='o'?{x:o.x,y:o.y,z:o.z,rx:o.rx,ry:o.ry,rz:o.rz,s:o.s}:{x:o.x||0,y:o.y||0,z:o.z||0,r:o.rot||0,rx:o.rx||0,ry:o.ry||0,s:o.sc||1}};return true;
 }
 function applyGz(z,e){
-  const R=ray3(e),d=axT(R.ray,z.P,A3v(z.ax))-z.t0,o=z.T.o,s=z.s,u=4/cv.height,c3=z.T.k==='o';
-  if(z.mode==='move'){if(c3){const k='xyz'[z.ax];o[k]=s[k]+d;}else if(z.ax===0)o.x=s.x+d/(cv.width*u);else if(z.ax===1)o.y=s.y-d/(cv.height*u);else o.z=Math.max(-20,Math.min(7,s.z+d));}
+  const R=ray3(e),d=axT(R.ray,z.P,A3v(z.ax))-z.t0,o=z.T.o,s=z.s,u=4/cv.height,c3=z.T.k!=='c',pf=z.T.k==='l'?'l':'';
+  if(z.mode==='move'){if(c3){const k='xyz'[z.ax];o[pf+k]=s[k]+d;}else if(z.ax===0)o.x=s.x+d/(cv.width*u);else if(z.ax===1)o.y=s.y-d/(cv.height*u);else o.z=Math.max(-20,Math.min(7,s.z+d));}
   else if(z.mode==='scale'){const f=Math.max(.05,1+d*.6);if(c3)o.s=s.s*f;else o.sc=s.s*f;}
   else{const a=(scrAng(e,z.P)-z.a0)*180/Math.PI,sg=Math.sign(A3v(z.ax).dot(EC.position.clone().sub(z.P)))||1;if(c3){const k=['rx','ry','rz'][z.ax];o[k]=s[k]-a*sg;}else if(z.ax===2)o.rot=s.r+a*sg;else{const k=z.ax?'ry':'rx';o[k]=s[k]-a*sg;}}
-  if(!c3&&o.kf)kfSync(o);
+  if(o.kf){if(c3)kfSync3(o,cur3);else kfSync(o);}
 }
 function ray3(e){const r=RV.domElement.getBoundingClientRect();rc().setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),EC);return rc();}
 function drag3(e,g){ // палец на 2D-клипе в 3D-виде: тащим клип, и он двигается и в 2D
@@ -1139,13 +1186,13 @@ function drag3(e,g){ // палец на 2D-клипе в 3D-виде: тащим
 }
 function initRV(){
   try{RV=new THREE.WebGLRenderer({antialias:true});}catch(e){RV=false;toast('WebGL недоступен в этом браузере');return;}
-  RV.setPixelRatio(Math.min(devicePixelRatio||1,2));RV.setClearColor(0x2b2b2b,1);EC=new THREE.PerspectiveCamera(50,1,.1,500);
+  RV.setPixelRatio(Math.min(devicePixelRatio||1,2));RV.setClearColor(0x2b2b2b,1);RV.shadowMap.enabled=true;EC=new THREE.PerspectiveCamera(50,1,.1,500);
   const el=RV.domElement,ps=new Map();let g=null;const dist=()=>{const [a,b]=[...ps.values()];return Math.hypot(a[0]-b[0],a[1]-b[1])||1;};
-  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);ps.set(e.pointerId,[e.clientX,e.clientY]);const cm=cur3.sc3.cam;g={x:e.clientX,y:e.clientY,a:ev.a,e:ev.e,d:ev.d,ca:cm.a,ce:cm.e,cd:cm.d,p:ps.size>1?dist():0,moved:false};if(ps.size===1&&!inCam&&!gz3(e,g))drag3(e,g);});
+  el.addEventListener('pointerdown',e=>{el.setPointerCapture(e.pointerId);ps.set(e.pointerId,[e.clientX,e.clientY]);const cm=cur3.sc3.cam;if(inCam&&cm.kf)kfBake3(cm,cur3);g={x:e.clientX,y:e.clientY,a:ev.a,e:ev.e,d:ev.d,ca:cm.a,ce:cm.e,cd:cm.d,p:ps.size>1?dist():0,moved:false};if(ps.size===1&&!inCam&&!gz3(e,g))drag3(e,g);});
   el.addEventListener('pointermove',e=>{ // один палец вращает вид, два пальца приближают
     if(!ps.has(e.pointerId)||!g)return;ps.set(e.pointerId,[e.clientX,e.clientY]);
-    if(ps.size>1){if(!g.p){g.p=dist();g.d=ev.d;}if(inCam)cur3.sc3.cam.d=Math.max(1,Math.min(60,g.cd*g.p/dist()));else ev.d=Math.max(1.5,Math.min(60,g.d*g.p/dist()));g.moved=true;}
-    else{const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.abs(dx)+Math.abs(dy)>4)g.moved=true;if(g.moved&&!g.p){if(g.gz)applyGz(g.gz,e);else if(g.dr){const p=new THREE.Vector3();if(ray3(e).ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),-g.dr.z),p)){const u=4/cv.height;g.dr.c.x=g.dr.x+(p.x-g.dr.p.x)/(cv.width*u);g.dr.c.y=g.dr.y-(p.y-g.dr.p.y)/(cv.height*u);if(g.dr.c.kf)kfSync(g.dr.c);}}else if(inCam){const cm=cur3.sc3.cam;cm.a=g.ca-dx*.4;cm.e=Math.max(-85,Math.min(85,g.ce+dy*.4));}else{ev.a=g.a-dx*.4;ev.e=Math.max(-85,Math.min(85,g.e+dy*.4));}}}
+    if(ps.size>1){if(!g.p){g.p=dist();g.d=ev.d;}if(inCam){cur3.sc3.cam.d=Math.max(1,Math.min(60,g.cd*g.p/dist()));if(cur3.sc3.cam.kf)kfSync3(cur3.sc3.cam,cur3);}else ev.d=Math.max(1.5,Math.min(60,g.d*g.p/dist()));g.moved=true;}
+    else{const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.abs(dx)+Math.abs(dy)>4)g.moved=true;if(g.moved&&!g.p){if(g.gz)applyGz(g.gz,e);else if(g.dr){const p=new THREE.Vector3();if(ray3(e).ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),-g.dr.z),p)){const u=4/cv.height;g.dr.c.x=g.dr.x+(p.x-g.dr.p.x)/(cv.width*u);g.dr.c.y=g.dr.y-(p.y-g.dr.p.y)/(cv.height*u);if(g.dr.c.kf)kfSync(g.dr.c);}}else if(inCam){const cm=cur3.sc3.cam;cm.a=g.ca-dx*.4;cm.e=Math.max(-85,Math.min(85,g.ce+dy*.4));if(cm.kf)kfSync3(cm,cur3);}else{ev.a=g.a-dx*.4;ev.e=Math.max(-85,Math.min(85,g.e+dy*.4));}}}
   });
   el.addEventListener('pointerup',e=>{ps.delete(e.pointerId);if(g&&!g.moved&&!ps.size&&!g.gz)pick3(e);if(g&&g.moved&&!ps.size)save();if(!ps.size)g=null;});
   el.addEventListener('pointercancel',()=>{ps.clear();g=null;});
@@ -1168,6 +1215,7 @@ function mir3(K,c3){ // 2D-клипы как плоскости в 3D-виде: 
 function rv3(){ // рисуем сцену с камерой редактора + вспомогательные значки
   if(!window.THREE||!RV)return;
   cur3=clips.find(k=>k.id===cur3.id)||cur3;const c=cur3,K=cache[c.id];if(!K)return;
+  if(outl.k!==s3+'|'+c.sc3.objs.length)outl();
   if(!K.help)mkHelp(K);
   const hp=K.help,box=$('e3v'),w=box.clientWidth,h=box.clientHeight;
   if(w&&h&&(w!==rvw||h!==rvh)){rvw=w;rvh=h;RV.setSize(w,h,false);EC.aspect=w/h;EC.updateProjectionMatrix();}
@@ -1202,7 +1250,7 @@ function objWin(S,mode){
     const src=o.src&&clips.find(k=>k.id===o.src),m=src&&media[src.m],r=document.createElement('div'),th=m&&(m.thumb||(m.type==='image'&&m.url));
     r.className='row';r.style.cssText='margin:6px 0';
     r.innerHTML=(th?`<img src='${th}' style='width:44px;height:44px;object-fit:cover;border-radius:6px'>`:'')+`<span style='flex:2'></span>`;
-    r.querySelector('span').textContent=(m?m.name:(o.txt||NMS[o.kind]+' '+(i+1)))+(S.cam.att===o.id?' (камера здесь)':'');
+    r.querySelector('span').textContent=(o.name||(m?m.name:(o.txt||NMS[o.kind]+' '+(i+1))))+(S.cam.att===o.id?' (камера здесь)':'');
     const bt=(l,f)=>{const b=document.createElement('button');b.className='ch'+(s3===o.id?' on':'');b.textContent=l;b.onclick=f;r.append(b);};
     const att=w=>{S.cam.att=o.id;S.cam.win=w;s3=o.id;save();closeMd();toast(w?'Камера в центре «окна»':'Камера привязана');};
     if(mode==='attach'){bt('Окно',()=>att(true));bt('Следить',()=>att(false));}
@@ -1212,6 +1260,27 @@ function objWin(S,mode){
   });
   $('oc').onclick=closeMd;
 }
+function kf3(){ // ключи в 3D: объект, свет или камера; ключ ставится на текущем времени сцены
+  const c=cur3,S=c.sc3,old=JSON.stringify(S);let tg=s3==='light'?'l':s3&&S.objs.some(q=>q.id===s3)?'o':'c';
+  const H=()=>tg==='l'?S.light:tg==='c'?S.cam:S.objs.find(q=>q.id===s3),P=()=>tg==='l'?KL:tg==='c'?KC:KO,rr=()=>+(t-c.start).toFixed(2);
+  sheet('Ключи 3D',"<div style='opacity:.7;margin-bottom:8px'>Выбери объект, свет или камеру. Бегунком внизу поставь время и нажми «Ключ здесь». Потом перемотай и подвинь стрелками: ключ поставится сам, всё поедет плавно.</div><div id='kg'></div><button class='ch' id='ka'>◆ Ключ здесь</button><button class='ch' id='kd'>Убрать ключ здесь</button><button class='ch' id='kn'>След. ключ →</button><button class='ch' id='kx'>Убрать все</button><div id='kt' style='margin-top:8px'></div>",()=>save(),()=>{c.sc3=JSON.parse(old);delete cache[c.id];});
+  const tx=()=>{const h=H(),a=[...new Set(Object.values((h&&h.kf)||{}).flat().map(q=>q[0]))].sort((x,y)=>x-y);$('kt').textContent=!h?'Выбери объект: тапни по нему в сцене':a.length?'Ключи, с: '+a.map(x=>x.toFixed(1)).join(', ')+'. Сейчас: '+rr().toFixed(1):'Ключей нет';};
+  const tgs=()=>{$('kg').innerHTML='';[['o','Объект'],['l','Свет'],['c','Камера']].forEach(([k,l])=>{const b=document.createElement('button');b.className='ch'+(tg===k?' on':'');b.textContent=l;b.onclick=()=>{tg=k;tgs();tx();};$('kg').append(b);});};
+  $('ka').onclick=()=>{const h=H();if(!h)return toast('Выбери объект: тапни по нему в сцене');const r=rr();h.kf=h.kf||{};P().forEach(p=>setKf(h,p,r,ip(h.kf[p],r,h[p])));tx();};
+  $('kd').onclick=()=>{const h=H();if(!h||!h.kf)return;const r=t-c.start;for(const p in h.kf)h.kf[p]=h.kf[p].filter(q=>Math.abs(q[0]-r)>=.05);if(!Object.values(h.kf).some(a=>a.length))delete h.kf;tx();};
+  $('kn').onclick=()=>{const h=H();if(!h||!h.kf)return;const r=t-c.start,n=[...new Set(Object.values(h.kf).flat().map(q=>q[0]))].sort((a,b)=>a-b).find(x=>x>r+.05);if(n!==undefined)t=c.start+n;tx();};
+  $('kx').onclick=()=>{const h=H();if(h)delete h.kf;tx();};tgs();tx();
+}
+const NM3={cube:'Куб',sphere:'Шар',plane:'Плоскость',cyl:'Цилиндр',layer:'Слой',text:'Текст'};
+function nm3(o,i){const k=o.src&&clips.find(q=>q.id===o.src),m=k&&media[k.m];return o.name||(m?m.name:(o.txt||NM3[o.kind]+' '+(i+1)));}
+function outl(){ // выпадающий список сцены, как в Blender: камера, свет, объекты; выбрать, переименовать, удалить
+  const q=$('e3q');if(!q.classList.contains('open')||!cur3)return;q.innerHTML='';const S=cur3.sc3;outl.k=s3+'|'+S.objs.length;
+  const row=(id,name,ren,del)=>{const r=document.createElement('div');r.className='r';const b=document.createElement('button');b.className='n'+(s3===id?' on':'');b.textContent=name;b.onclick=()=>{s3=id;outl();};r.append(b);
+    [[ren,'pen'],[del,'trash']].forEach(([f,i])=>{if(!f)return;const e=document.createElement('button');e.className='ib';e.innerHTML=ic(i,18);e.onclick=f;r.append(e);});q.append(r);};
+  row('cam','Камера');row('light','Свет');
+  S.objs.forEach((o,i)=>row(o.id,nm3(o,i),()=>ask('Имя объекта',nm3(o,i),v=>{o.name=v;save();outl();}),()=>{S.objs=S.objs.filter(x=>x!==o);if(S.cam.att===o.id)S.cam.att=null;if(s3===o.id)s3=null;save();outl();}));
+}
+$('e3o').onclick=()=>{const q=$('e3q');q.classList.toggle('open');$('e3o').style.transform=q.classList.contains('open')?'rotate(180deg)':'';outl();};
 function mediaWin(){ // видео и картинки проекта — в сцену плоскостью
   const S=cur3.sc3,L=clips.filter(k=>k.m&&media[k.m]&&media[k.m].type!=='audio');
   md(`<b>Что поставить в сцену</b><div id='ml2'></div><button id='mc2'>Закрыть</button>`);
@@ -1234,7 +1303,7 @@ $('e3h').onclick=exit3;$('e3u').onclick=undo;$('e3r').onclick=redo;$('e3pl').onc
 $('e3z').onclick=()=>{Object.assign(ev,{a:35,e:20,d:9});};
 $('e3l').onclick=()=>objWin(cur3.sc3,'list');
 $('e3s').oninput=e=>{t=cur3.start+ +e.target.value*cur3.dur;};
-[['cube','Модели',()=>{tab3='o';sheet3();}],['sky','Небо',skyWin],['cam','Камера',()=>{tab3='c';sheet3();}],['bulb','Свет',()=>{tab3='l';sheet3();}],['img','Медиа',mediaWin],['text','Текст',textWin]]
+[['cube','Модели',()=>{tab3='o';sheet3();}],['sky','Небо',skyWin],['cam','Камера',()=>{tab3='c';sheet3();}],['bulb','Свет',()=>{s3='light';tab3='l';sheet3();}],['img','Медиа',mediaWin],['text','Текст',textWin],['keys','Ключи',kf3]]
   .forEach(([i,l,f])=>{const b=document.createElement('button');b.innerHTML='<b>'+ic(i)+'</b>'+l;b.onclick=f;$('e3b').append(b);});
 camBtn=document.createElement('button');const cbl=camBtn.upd=()=>{camBtn.innerHTML='<b>'+ic('cam')+'</b>'+(inCam?'Из камеры':'В камеру');camBtn.style.color=inCam?'#4fd1e5':'#fff';};cbl();
 camBtn.onclick=()=>{inCam=!inCam;cbl();toast(inCam?'Ты в камере: палец двигает её, два пальца — ближе и дальше':'Обычный вид');};$('e3b').append(camBtn);
@@ -1245,12 +1314,25 @@ gb.onclick=()=>{gzMode=gzMode==='move'?'rot':gzMode==='rot'?'scale':'move';gl();
 // ===== Главное меню: проекты =====
 (function(){const st=document.createElement('style');st.textContent="#home{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));overflow:auto}#home.open{display:flex}#home h1{margin:8px 0 16px;font-size:26px}#hn{background:var(--ac);color:#000;font-weight:700;font-size:16px;min-height:64px;margin-bottom:20px}#home .pc{display:flex;gap:12px;align-items:center;padding:10px;margin-bottom:10px;text-align:left;min-height:84px;width:100%}#home .pc img,#home .ph0{width:64px;height:64px;border-radius:10px;object-fit:cover;background:#2c3e50;flex:none}";document.head.appendChild(st);})();
 function homeShow(){
-  pause();let h=$('home');if(!h){h=document.createElement('div');h.id='home';document.body.appendChild(h);}
-  const n=clips.length,d=total(),m0=clips.map(c=>media[c.m]).find(m=>m&&m.thumb);
-  h.innerHTML="<h1>Проекты</h1><button id='hn'>＋ Новый проект</button>"+(n?"<button class='pc' id='hc'>"+(m0?"<img src='"+m0.thumb+"'>":"<div class='ph0'></div>")+"<div><b>Мой проект</b><br><span style='opacity:.6'>"+n+" клипов · "+d.toFixed(1)+" с</span></div></button>":"<div style='opacity:.5'>Пока пусто</div>");
+  pause();pFlush();let h=$('home');if(!h){h=document.createElement('div');h.id='home';document.body.appendChild(h);}
+  h.innerHTML="<h1>Проекты</h1><button id='hn'>＋ Новый проект</button><div id='hl'></div>";
+  const L=pidx.filter(e=>e.n>0||e.id===pid).sort((a,b)=>b.ts-a.ts);
+  if(!L.length)$('hl').innerHTML="<div style='opacity:.5'>Пока пусто</div>";
+  L.forEach(e=>{
+    const r=document.createElement('div');r.className='row';r.style.marginBottom='10px';
+    const b=document.createElement('button');b.className='pc';b.style.cssText='flex:1;width:auto;margin:0';
+    b.innerHTML=(e.thumb?"<img src='"+e.thumb+"'>":"<div class='ph0'></div>")+"<div><b></b>"+(e.id===pid?' ✓':'')+"<br><span style='opacity:.6'>"+e.n+" клипов · "+(+e.dur).toFixed(1)+" с</span></div>";
+    b.querySelector('b').textContent=e.name;
+    b.onclick=()=>{if(e.id===pid)h.classList.remove('open');else openProj(e.id).then(()=>h.classList.remove('open'));};
+    const rn=document.createElement('button');rn.className='ib';rn.innerHTML=ic('pen',20);
+    rn.onclick=()=>ask('Название проекта',e.name,v=>{e.name=v;if(e.id===pid)pname=v;if(pdb)try{pdb.transaction('p','readwrite').objectStore('p').put(pidx,'idx');}catch(x){}homeShow();});
+    const dl=document.createElement('button');dl.className='ib';dl.innerHTML=ic('trash',20);let sure=0;
+    dl.onclick=()=>{if(!sure){sure=1;dl.innerHTML='<span style="font-size:12px;color:#f66">Удалить?</span>';return;}
+      if(e.id===pid){resetProj();pid='p'+Date.now();pname='Проект '+(pidx.length);projDel(e.id);save();fitCanvas();build();}else projDel(e.id);homeShow();};
+    r.append(b,rn,dl);$('hl').append(r);
+  });
   h.classList.add('open');
-  $('hn').onclick=()=>{if(n)newProj();h.classList.remove('open');};
-  if(n)$('hc').onclick=()=>h.classList.remove('open');
+  $('hn').onclick=()=>{if(clips.length)newProj();h.classList.remove('open');};
 }
 
 // ===== Запуск =====
